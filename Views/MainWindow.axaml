@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Tarea.Views.MainWindow"
+        Title="Tarea"
+        Width="1100" Height="700"
+        MinWidth="600" MinHeight="500"
+        Background="{DynamicResource BlackBrush}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- ── Nav Bar (placeholder) ─────────────────────── -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource BlackBrush}"
+                BorderBrush="{DynamicResource RoseBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,8">
+            <TextBlock Text="tarea"
+                       FontSize="15"
+                       FontFamily="Consolas, Courier New, monospace"
+                       Foreground="{DynamicResource RoseBrush}" />
+        </Border>
+
+        <!-- ── Content Area ──────────────────────────────── -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource BlackBrush}"
+                Padding="24">
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Spacing="8">
+                <TextBlock Text="tarea"
+                           FontSize="24"
+                           FontFamily="Consolas, Courier New, monospace"
+                           Foreground="{DynamicResource RoseBrush}"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="> phase 1 complete — foundation verified"
+                           FontSize="13"
+                           FontFamily="Consolas, Courier New, monospace"
+                           Foreground="{DynamicResource MutedBrush}"
+                           HorizontalAlignment="Center" />
+                <TextBlock x:Name="StatsText"
+                           FontSize="13"
+                           FontFamily="Consolas, Courier New, monospace"
+                           Foreground="{DynamicResource MutedBrush}"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- ── Footer (placeholder) ──────────────────────── -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource BlackBrush}"
+                BorderBrush="{DynamicResource RoseBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,6">
+            <TextBlock Text="made by _nickyv"
+                       FontSize="12"
+                       FontFamily="Consolas, Courier New, monospace"
+                       Foreground="{DynamicResource MutedBrush}" />
+        </Border>
+
+    </Grid>
+
+</Window>

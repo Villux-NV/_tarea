@@ -1,0 +1,30 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Tarea.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+
+    <Application.Resources>
+        <!-- Base font size (ThemeService overwrites at runtime) -->
+        <x:Double x:Key="BaseFontSize">14</x:Double>
+
+        <!-- ── Tarea Retro Palette (defaults — ThemeService overwrites at runtime) ── -->
+        <SolidColorBrush x:Key="BlackBrush" Color="#0C0002" />
+        <SolidColorBrush x:Key="SlateBrush" Color="#0F172A" />
+        <SolidColorBrush x:Key="RoseBrush" Color="#E8B4B8" />
+        <SolidColorBrush x:Key="OrangeBrush" Color="#FC5B13" />
+        <SolidColorBrush x:Key="GreenBrush" Color="#7B832D" />
+        <SolidColorBrush x:Key="BlueBrush" Color="#00B3B0" />
+        <SolidColorBrush x:Key="YellowBrush" Color="#FBA824" />
+        <SolidColorBrush x:Key="MutedBrush" Color="#665E5F" />
+
+        <!-- Status colors (overwritten by ThemeService) -->
+        <SolidColorBrush x:Key="StatusTodoBrush" Color="#FBA824" />
+        <SolidColorBrush x:Key="StatusWipBrush" Color="#FC5B13" />
+        <SolidColorBrush x:Key="StatusDoneBrush" Color="#7B832D" />
+    </Application.Resources>
+
+</Application>
