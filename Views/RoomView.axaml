@@ -1,0 +1,425 @@
+<UserControl x:Class="Tarea.Views.RoomView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:Tarea.Converters"
+             xmlns:vm="clr-namespace:Tarea.ViewModels"
+             x:DataType="vm:RoomViewModel"
+             Background="{DynamicResource BlackBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ── Cards Grid ───────────────────────────────── -->
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl x:Name="CardItemsControl"
+                          ItemsSource="{Binding Cards}"
+                          Margin="24,16">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel HorizontalAlignment="Left" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CardViewModel">
+                        <Border Tag="CardRoot"
+                                Classes="card-hover"
+                                Width="{Binding CardWidth}"
+                                Height="{Binding CardHeight}"
+                                Margin="12"
+                                Background="Transparent"
+                                IsVisible="{Binding !IsHidden}"
+                                PointerPressed="Card_PointerPressed"
+                                PointerMoved="Card_PointerMoved">
+                            <Grid>
+                                <!-- ══ FRONT ══ -->
+                                <Border Background="{Binding Urgency, Converter={StaticResource UrgencyToBrush}}"
+                                        BorderBrush="{DynamicResource RoseBrush}"
+                                        BorderThickness="1"
+                                        Padding="8"
+                                        RenderTransformOrigin="50%,50%">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="1" />
+                                    </Border.RenderTransform>
+
+                                    <Grid RowDefinitions="Auto,*,Auto">
+
+                                        <!-- Header: title + drag handle -->
+                                        <DockPanel Grid.Row="0" Margin="4,4,4,8">
+                                            <TextBlock Text="///"
+                                                       Tag="CardDragHandle"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="{DynamicResource MutedBrush}"
+                                                       FontSize="12"
+                                                       VerticalAlignment="Center"
+                                                       Cursor="Hand" />
+
+                                            <Border ClipToBounds="True"
+                                                    PointerEntered="CardTitle_PointerEntered"
+                                                    PointerExited="CardTitle_PointerExited">
+                                                <TextBlock Text="{Binding Title}"
+                                                           FontSize="15"
+                                                           TextTrimming="CharacterEllipsis">
+                                                    <TextBlock.RenderTransform>
+                                                        <TranslateTransform X="0" />
+                                                    </TextBlock.RenderTransform>
+                                                </TextBlock>
+                                            </Border>
+                                        </DockPanel>
+
+                                        <!-- Body: notes -->
+										<Border Grid.Row="1"
+                                                Tag="NoteDropZone"
+                                                BorderBrush="{DynamicResource RoseBrush}"
+                                                BorderThickness="1"
+                                                Margin="4,0"
+                                                Padding="4"
+                                                DragDrop.AllowDrop="True">
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                          HorizontalScrollBarVisibility="Disabled">
+                                                <StackPanel>
+                                                    <!-- Existing notes -->
+                                                    <ItemsControl ItemsSource="{Binding Notes}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="vm:CardNoteViewModel">
+																<Border Tag="NoteRow"
+                                                                        BorderBrush="{DynamicResource MutedBrush}"
+                                                                        BorderThickness="0,0,0,0.5"
+                                                                        Padding="2,2"
+                                                                        Background="{Binding IsSelected, Converter={x:Static conv:SelectedBgConverter.Instance}}"
+                                                                        PointerPressed="Note_PointerPressed"
+                                                                        PointerReleased="Note_PointerReleased"
+                                                                        DragDrop.AllowDrop="True">
+
+                                                                    <Grid>
+                                                                        <!-- Normal / Selected display -->
+                                                                        <DockPanel IsVisible="{Binding !IsEditing}">
+
+                                                                            <!-- Drag handle (selected only) -->
+                                                                            <TextBlock Text="///"
+                                                                                       DockPanel.Dock="Left"
+                                                                                       Foreground="{DynamicResource MutedBrush}"
+                                                                                       FontSize="10"
+                                                                                       VerticalAlignment="Center"
+                                                                                       Margin="0,0,4,0"
+                                                                                       Cursor="SizeAll"
+                                                                                       IsVisible="{Binding IsSelected}"
+                                                                                       PointerPressed="NoteDragHandle_PointerPressed" />
+
+                                                                            <!-- Delete × (selected only) -->
+                                                                            <Button DockPanel.Dock="Right"
+                                                                                    Command="{Binding DeleteCommand}"
+                                                                                    Cursor="Hand"
+                                                                                    Margin="4,0,0,0"
+                                                                                    IsVisible="{Binding IsSelected}">
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate>
+                                                                                        <Border Background="Transparent" Padding="2,0">
+                                                                                            <TextBlock Text="×"
+                                                                                                       FontSize="12"
+                                                                                                       Foreground="{DynamicResource MutedBrush}"
+                                                                                                       VerticalAlignment="Center" />
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+
+                                                                            <!-- Note text -->
+                                                                            <TextBlock Text="{Binding Text}"
+                                                                                       FontSize="11"
+                                                                                       TextWrapping="Wrap"
+                                                                                       VerticalAlignment="Center"
+                                                                                       Foreground="{Binding NoteForegroundKey, Converter={StaticResource ResourceKeyToBrush}}"
+                                                                                       TextDecorations="{Binding ShowStrikethrough, Converter={x:Static conv:StrikethroughConverter.Instance}}" />
+                                                                        </DockPanel>
+
+                                                                        <!-- Editing display -->
+                                                                        <TextBox Text="{Binding EditText}"
+                                                                                 FontSize="11"
+                                                                                 BorderThickness="0,0,0,1"
+                                                                                 BorderBrush="{DynamicResource RoseBrush}"
+                                                                                 Padding="2,2"
+                                                                                 IsVisible="{Binding IsEditing}"
+                                                                                 KeyDown="NoteEdit_KeyDown"
+                                                                                 AttachedToVisualTree="InputField_AttachedToVisualTree" />
+                                                                    </Grid>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+
+                                                    <!-- Add note: "+" button -->
+                                                    <StackPanel Tag="NoteAddArea"
+                                                                IsVisible="{Binding !IsAddingNote}">
+                                                        <Border BorderBrush="{DynamicResource MutedBrush}"
+                                                                BorderThickness="0,0,0,0.5"
+                                                                Margin="0,4,0,0"
+                                                                IsVisible="{Binding Notes.Count, Converter={StaticResource ZeroToBool}}" />
+                                                        <Button Click="AddNoteButton_Click"
+                                                                HorizontalAlignment="Center"
+                                                                Cursor="Hand">
+                                                            <Button.Template>
+                                                                <ControlTemplate>
+                                                                    <Border Background="Transparent" Padding="2,4">
+                                                                        <TextBlock Text="+"
+                                                                                   FontSize="13"
+                                                                                   Foreground="{DynamicResource MutedBrush}"
+                                                                                   HorizontalAlignment="Center" />
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                        </Button>
+                                                    </StackPanel>
+
+                                                    <!-- Add note: text input -->
+                                                    <Border Tag="NoteAddArea" Margin="0,2,0,0"
+                                                            IsVisible="{Binding IsAddingNote}">
+                                                        <TextBox Text="{Binding NewNoteText}"
+                                                                 FontSize="11"
+                                                                 BorderThickness="0,0,0,1"
+                                                                 BorderBrush="{DynamicResource RoseBrush}"
+                                                                 Padding="4,3"
+                                                                 KeyDown="NoteAdd_KeyDown"
+                                                                 AttachedToVisualTree="InputField_AttachedToVisualTree" />
+                                                    </Border>
+                                                </StackPanel>
+                                            </ScrollViewer>
+                                        </Border>
+
+                                        <!-- Footer: status badge + flip -->
+                                        <DockPanel Grid.Row="2" Margin="4,8,4,4">
+                                            <Button Content="⟲"
+                                                    Classes="ghost"
+                                                    FontSize="16"
+                                                    DockPanel.Dock="Right"
+                                                    Click="FlipCard_Click"
+                                                    Tag="front" />
+
+                                            <Button Command="{Binding CycleStatusCommand}"
+                                                    Click="StatusBadge_Click"
+                                                    DockPanel.Dock="Left"
+                                                    Cursor="Hand">
+                                                <Button.Template>
+                                                    <ControlTemplate>
+                                                        <Border Background="Transparent"
+                                                                BorderBrush="{ReflectionBinding Status, Converter={StaticResource StatusToBrush}}"
+                                                                BorderThickness="1"
+                                                                Padding="6,2"
+                                                                MinWidth="124">
+                                                            <TextBlock Text="{ReflectionBinding StatusLabel}"
+                                                                       Foreground="{ReflectionBinding Status, Converter={StaticResource StatusToBrush}}"
+                                                                       FontSize="11"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center" />
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+
+                                            <TextBlock />
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+
+                                <!-- ══ BACK ══ -->
+                                <Border Background="{Binding Urgency, Converter={StaticResource UrgencyToBrush}}"
+                                        BorderBrush="{DynamicResource RoseBrush}"
+                                        BorderThickness="1"
+                                        Padding="8"
+                                        RenderTransformOrigin="50%,50%">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="0" />
+                                    </Border.RenderTransform>
+
+                                    <Grid RowDefinitions="Auto,*,Auto">
+
+                                        <!-- Header -->
+                                        <DockPanel Grid.Row="0" Margin="4,4,4,8">
+                                            <Border ClipToBounds="True"
+                                                    PointerEntered="CardTitle_PointerEntered"
+                                                    PointerExited="CardTitle_PointerExited">
+                                                <TextBlock Text="{Binding Title}"
+                                                           FontSize="15"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           TextTrimming="CharacterEllipsis">
+                                                    <TextBlock.RenderTransform>
+                                                        <TranslateTransform X="0" />
+                                                    </TextBlock.RenderTransform>
+                                                </TextBlock>
+                                            </Border>
+                                        </DockPanel>
+
+                                        <!-- Details -->
+                                        <Border Grid.Row="1"
+                                                BorderBrush="{DynamicResource RoseBrush}"
+                                                BorderThickness="1"
+                                                Margin="4,0"
+                                                Padding="8">
+                                            <StackPanel>
+                                                <!-- Due date row -->
+                                                <StackPanel Margin="0,0,0,8">
+                                                    <DockPanel>
+                                                        <Button Content="×"
+                                                                Classes="danger"
+                                                                DockPanel.Dock="Right"
+                                                                Command="{Binding ClearDueDateCommand}"
+                                                                IsVisible="{Binding HasDueDate}"
+                                                                VerticalAlignment="Center" />
+                                                        <Button Command="{Binding ToggleDatePickerCommand}"
+                                                                Cursor="Hand"
+                                                                HorizontalAlignment="Left">
+                                                            <Button.Template>
+                                                                <ControlTemplate>
+                                                                    <Border Background="Transparent" Padding="0,2">
+                                                                        <TextBlock Text="{ReflectionBinding DueDateDisplay}"
+                                                                                   FontSize="11"
+                                                                                   Foreground="{ReflectionBinding DueDateBrushKey, Converter={StaticResource ResourceKeyToBrush}}" />
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                        </Button>
+                                                    </DockPanel>
+
+                                                    <!-- Date picker popup -->
+                                                    <Popup IsOpen="{Binding IsDatePickerOpen}"
+                                                           IsLightDismissEnabled="True"
+                                                           Placement="Bottom">
+                                                        <Border Background="{DynamicResource BlackBrush}"
+                                                                BorderBrush="{DynamicResource RoseBrush}"
+                                                                BorderThickness="1"
+                                                                Padding="4">
+                                                            <Calendar SelectedDate="{Binding SelectedDate}"
+                                                                      DisplayDate="{Binding SelectedDate}" />
+                                                        </Border>
+                                                    </Popup>
+                                                </StackPanel>
+
+                                                <!-- Urgency -->
+                                                <DockPanel Margin="0,0,0,8">
+                                                    <TextBlock Text="urgency: "
+                                                               FontSize="12"
+                                                               Foreground="{DynamicResource MutedBrush}"
+                                                               VerticalAlignment="Center" />
+                                                    <Button Command="{Binding CycleUrgencyCommand}"
+                                                            Cursor="Hand">
+                                                        <Button.Template>
+                                                            <ControlTemplate>
+                                                                <Border Background="Transparent" Padding="4,1">
+                                                                    <TextBlock Text="{ReflectionBinding UrgencyLabel}"
+                                                                               FontSize="12" />
+                                                                </Border>
+                                                            </ControlTemplate>
+                                                        </Button.Template>
+                                                    </Button>
+                                                </DockPanel>
+
+                                                <!-- Status -->
+                                                <TextBlock FontSize="12" Margin="0,0,0,4">
+                                                    <Run Text="status: " Foreground="{DynamicResource MutedBrush}" />
+                                                    <Run Text="{Binding StatusLabel}" />
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Footer: delete + flip back -->
+                                        <DockPanel Grid.Row="2" Margin="4,8,4,4">
+                                            <Button Content="⟲"
+                                                    Classes="ghost"
+                                                    FontSize="16"
+                                                    DockPanel.Dock="Right"
+                                                    Click="FlipCard_Click"
+                                                    Tag="back" />
+                                            <Button Content="delete"
+                                                    Classes="danger"
+                                                    Command="{Binding DeleteCommand}"
+                                                    DockPanel.Dock="Left" />
+                                            <TextBlock />
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ── Status Bar ──────────────────────────────── -->
+        <Border Grid.Row="1"
+                BorderBrush="{DynamicResource MutedBrush}"
+                BorderThickness="0,0.5,0,0"
+                Padding="16,6">
+            <DockPanel>
+                <!-- Left: completed card icons -->
+                <ItemsControl DockPanel.Dock="Left"
+                              ItemsSource="{Binding CompletedCards}"
+                              VerticalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CardViewModel">
+                            <TextBlock Text="[x]"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource GreenBrush}"
+                                       Margin="0,0,4,0"
+                                       Cursor="Hand"
+                                       Opacity="{Binding IsHidden, Converter={x:Static conv:HiddenOpacityConverter.Instance}}"
+                                       PointerPressed="CompletedIcon_Click">
+                                <ToolTip.Tip>
+                                    <TextBlock Text="{Binding CompletedTooltip}" />
+                                </ToolTip.Tip>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Right: ratio bar -->
+                <TextBlock x:Name="RatioBarText"
+                           DockPanel.Dock="Right"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           FontSize="11" />
+
+                <!-- Center: text summary -->
+                <TextBlock Text="{Binding ProgressSummary}"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="11"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+
+        <!-- ── Add Card Bar ─────────────────────────────── -->
+        <Border Grid.Row="2"
+                BorderBrush="{DynamicResource RoseBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,8">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Border BorderBrush="{DynamicResource RoseBrush}"
+                        BorderThickness="2"
+                        Padding="0">
+                    <TextBox x:Name="TxtAddCard"
+                             Text="{Binding NewCardDescription}"
+                             Width="320"
+                             BorderThickness="0"
+                             FontSize="13"
+                             VerticalContentAlignment="Center"
+                             KeyDown="AddCard_KeyDown" />
+                </Border>
+
+                <Button Content="+ add card"
+                        Classes="primary"
+                        Command="{Binding AddCardCommand}"
+                        Margin="4,0,0,0" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

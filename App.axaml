@@ -1,30 +1,189 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:Tarea.Converters"
              x:Class="Tarea.App"
              RequestedThemeVariant="Dark">
 
-    <Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
+	<Application.Styles>
+		<FluentTheme />
 
-    <Application.Resources>
-        <!-- Base font size (ThemeService overwrites at runtime) -->
-        <x:Double x:Key="BaseFontSize">14</x:Double>
+		<!-- ══════════════════════════════════════════════════════
+             TAREA RETRO STYLES
+             WPF triggers → Avalonia pseudo-classes
+             ══════════════════════════════════════════════════════ -->
 
-        <!-- ── Tarea Retro Palette (defaults — ThemeService overwrites at runtime) ── -->
-        <SolidColorBrush x:Key="BlackBrush" Color="#0C0002" />
-        <SolidColorBrush x:Key="SlateBrush" Color="#0F172A" />
-        <SolidColorBrush x:Key="RoseBrush" Color="#E8B4B8" />
-        <SolidColorBrush x:Key="OrangeBrush" Color="#FC5B13" />
-        <SolidColorBrush x:Key="GreenBrush" Color="#7B832D" />
-        <SolidColorBrush x:Key="BlueBrush" Color="#00B3B0" />
-        <SolidColorBrush x:Key="YellowBrush" Color="#FBA824" />
-        <SolidColorBrush x:Key="MutedBrush" Color="#665E5F" />
+		<!-- ── Base Window ──────────────────────────────── -->
+		<Style Selector="Window">
+			<Setter Property="Background" Value="{DynamicResource BlackBrush}" />
+			<Setter Property="Foreground" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="FontFamily" Value="Consolas, Courier New, monospace" />
+			<Setter Property="FontSize" Value="{DynamicResource BaseFontSize}" />
+		</Style>
 
-        <!-- Status colors (overwritten by ThemeService) -->
-        <SolidColorBrush x:Key="StatusTodoBrush" Color="#FBA824" />
-        <SolidColorBrush x:Key="StatusWipBrush" Color="#FC5B13" />
-        <SolidColorBrush x:Key="StatusDoneBrush" Color="#7B832D" />
-    </Application.Resources>
+		<!-- ── TextBlock ────────────────────────────────── -->
+		<Style Selector="TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="FontFamily" Value="Consolas, Courier New, monospace" />
+			<Setter Property="FontSize" Value="{DynamicResource BaseFontSize}" />
+		</Style>
+
+		<!-- ── TextBox (retro input) ────────────────────── -->
+		<Style Selector="TextBox">
+			<Setter Property="Background" Value="{DynamicResource BlackBrush}" />
+			<Setter Property="Foreground" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="Padding" Value="8,6" />
+			<Setter Property="FontFamily" Value="Consolas, Courier New, monospace" />
+			<Setter Property="CaretBrush" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="SelectionBrush" Value="{DynamicResource BlueBrush}" />
+		</Style>
+		<Style Selector="TextBox:focus">
+			<Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}" />
+		</Style>
+		<!-- Kill the Fluent focus adorner ring -->
+		<Style Selector="TextBox:focus-visible">
+			<Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}" />
+		</Style>
+
+		<!-- ── Title Bar Buttons ────────────────────────── -->
+		<Style Selector="Button.titlebar">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Width" Value="36" />
+			<Setter Property="Height" Value="28" />
+			<Setter Property="Cursor" Value="Hand" />
+			<Setter Property="HorizontalContentAlignment" Value="Center" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+		</Style>
+		<Style Selector="Button.titlebar:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource SlateBrush}" />
+		</Style>
+		<Style Selector="Button.titlebar.close:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="#44EF4444" />
+		</Style>
+
+		<!-- ── Primary Button (outline style) ───────────── -->
+		<Style Selector="Button.primary">
+			<Setter Property="Background" Value="{DynamicResource BlackBrush}" />
+			<Setter Property="Foreground" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="Padding" Value="16,6" />
+			<Setter Property="Cursor" Value="Hand" />
+			<Setter Property="FontFamily" Value="Consolas, Courier New, monospace" />
+		</Style>
+		<Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource SlateBrush}" />
+		</Style>
+
+		<!-- ── Ghost/Link Button ────────────────────────── -->
+		<Style Selector="Button.ghost">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Padding" Value="8,4" />
+			<Setter Property="Cursor" Value="Hand" />
+			<Setter Property="FontFamily" Value="Consolas, Courier New, monospace" />
+		</Style>
+		<Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource BlueBrush}" />
+		</Style>
+
+		<!-- ── Danger Button ────────────────────────────── -->
+		<Style Selector="Button.danger">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Padding" Value="6,4" />
+			<Setter Property="Cursor" Value="Hand" />
+			<Setter Property="FontFamily" Value="Consolas, Courier New, monospace" />
+			<Setter Property="FontSize" Value="12" />
+		</Style>
+		<Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource OrangeBrush}" />
+		</Style>
+
+		<!-- ── Nav Button (top bar links) ───────────────── -->
+		<Style Selector="Button.nav">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource RoseBrush}" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Padding" Value="16,4" />
+			<Setter Property="Cursor" Value="Hand" />
+			<Setter Property="FontFamily" Value="Consolas, Courier New, monospace" />
+			<Setter Property="FontSize" Value="13" />
+		</Style>
+		<Style Selector="Button.nav:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource BlueBrush}" />
+		</Style>
+
+		<!-- ── Color Swatch Button ──────────────────────── -->
+		<Style Selector="Button.swatch">
+			<Setter Property="Width" Value="28" />
+			<Setter Property="Height" Value="28" />
+			<Setter Property="Margin" Value="3" />
+			<Setter Property="Cursor" Value="Hand" />
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="BorderThickness" Value="2" />
+			<Setter Property="CornerRadius" Value="4" />
+			<Setter Property="Padding" Value="0" />
+		</Style>
+		<Style Selector="Button.swatch:pointerover">
+			<Setter Property="BorderBrush" Value="{DynamicResource RoseBrush}" />
+		</Style>
+
+		<!-- ── Retro Scrollbar ──────────────────────────── -->
+		<Style Selector="ScrollViewer">
+			<Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+			<Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+		</Style>
+
+		<!-- ── Card Hover Scale (declarative via transitions) ── -->
+		<Style Selector="Border.card-hover">
+			<Setter Property="RenderTransformOrigin" Value="50%,50%" />
+			<Setter Property="RenderTransform" Value="scale(1)" />
+			<Setter Property="Transitions">
+				<Transitions>
+					<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" />
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="Border.card-hover:pointerover">
+			<Setter Property="RenderTransform" Value="scale(1.02)" />
+		</Style>
+
+	</Application.Styles>
+
+	<Application.Resources>
+		<!-- Converters -->
+		<conv:InverseBoolConverter x:Key="BoolInverse" />
+		<conv:ZeroToBoolConverter x:Key="ZeroToBool" />
+		<conv:ResourceKeyToBrushConverter x:Key="ResourceKeyToBrush" />
+		<conv:StatusToBrushConverter x:Key="StatusToBrush" />
+		<conv:StringToBrushConverter x:Key="StringToBrush" />
+		<conv:UrgencyToBrushConverter x:Key="UrgencyToBrush" />
+
+		<!-- Base font size (ThemeService overwrites at runtime) -->
+		<x:Double x:Key="BaseFontSize">14</x:Double>
+
+		<!-- ── Tarea Retro Palette (defaults — ThemeService overwrites at runtime) ── -->
+		<SolidColorBrush x:Key="BlackBrush" Color="#0C0002" />
+		<SolidColorBrush x:Key="SlateBrush" Color="#0F172A" />
+		<SolidColorBrush x:Key="RoseBrush" Color="#E8B4B8" />
+		<SolidColorBrush x:Key="OrangeBrush" Color="#FC5B13" />
+		<SolidColorBrush x:Key="GreenBrush" Color="#7B832D" />
+		<SolidColorBrush x:Key="BlueBrush" Color="#00B3B0" />
+		<SolidColorBrush x:Key="YellowBrush" Color="#FBA824" />
+		<SolidColorBrush x:Key="MutedBrush" Color="#665E5F" />
+
+		<!-- Status colors (overwritten by ThemeService) -->
+		<SolidColorBrush x:Key="StatusTodoBrush" Color="#FBA824" />
+		<SolidColorBrush x:Key="StatusWipBrush" Color="#FC5B13" />
+		<SolidColorBrush x:Key="StatusDoneBrush" Color="#7B832D" />
+	</Application.Resources>
 
 </Application>

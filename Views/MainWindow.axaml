@@ -2,61 +2,198 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Tarea.Views.MainWindow"
         Title="Tarea"
-        Width="1100" Height="700"
-        MinWidth="600" MinHeight="500"
-        Background="{DynamicResource BlackBrush}">
+        Height="700" Width="1100"
+        MinHeight="500" MinWidth="600"
+        WindowDecorations="None"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+	<!-- Outer border = the window edge -->
+	<Border BorderBrush="{DynamicResource RoseBrush}"
+            BorderThickness="1"
+            Background="{DynamicResource BlackBrush}">
 
-        <!-- ── Nav Bar (placeholder) ─────────────────────── -->
-        <Border Grid.Row="0"
-                Background="{DynamicResource BlackBrush}"
-                BorderBrush="{DynamicResource RoseBrush}"
-                BorderThickness="0,0,0,1"
-                Padding="16,8">
-            <TextBlock Text="tarea"
-                       FontSize="15"
-                       FontFamily="Consolas, Courier New, monospace"
-                       Foreground="{DynamicResource RoseBrush}" />
-        </Border>
+		<Grid RowDefinitions="Auto,Auto,*,Auto">
 
-        <!-- ── Content Area ──────────────────────────────── -->
-        <Border Grid.Row="1"
-                Background="{DynamicResource BlackBrush}"
-                Padding="24">
-            <StackPanel VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Spacing="8">
-                <TextBlock Text="tarea"
-                           FontSize="24"
-                           FontFamily="Consolas, Courier New, monospace"
-                           Foreground="{DynamicResource RoseBrush}"
-                           HorizontalAlignment="Center" />
-                <TextBlock Text="> phase 1 complete — foundation verified"
-                           FontSize="13"
-                           FontFamily="Consolas, Courier New, monospace"
-                           Foreground="{DynamicResource MutedBrush}"
-                           HorizontalAlignment="Center" />
-                <TextBlock x:Name="StatsText"
-                           FontSize="13"
-                           FontFamily="Consolas, Courier New, monospace"
-                           Foreground="{DynamicResource MutedBrush}"
-                           HorizontalAlignment="Center" />
-            </StackPanel>
-        </Border>
+			<!-- ── Custom Title Bar ───────────────────── -->
+			<Border Grid.Row="0"
+                    Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource MutedBrush}"
+                    BorderThickness="0,0,0,0.5"
+                    Padding="8,4"
+                    PointerPressed="TitleBar_PointerPressed">
+				<DockPanel>
+					<!-- Window title (left) -->
+					<TextBlock Text="tarea"
+                               FontSize="11"
+                               Foreground="{DynamicResource MutedBrush}"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Left"
+                               Margin="4,0,0,0" />
 
-        <!-- ── Footer (placeholder) ──────────────────────── -->
-        <Border Grid.Row="2"
-                Background="{DynamicResource BlackBrush}"
-                BorderBrush="{DynamicResource RoseBrush}"
-                BorderThickness="0,1,0,0"
-                Padding="16,6">
-            <TextBlock Text="made by _nickyv"
-                       FontSize="12"
-                       FontFamily="Consolas, Courier New, monospace"
-                       Foreground="{DynamicResource MutedBrush}" />
-        </Border>
+					<!-- Window controls (right) -->
+					<StackPanel Orientation="Horizontal"
+                                DockPanel.Dock="Right"
+                                HorizontalAlignment="Right"
+                                Spacing="0">
 
-    </Grid>
+						<!-- Minimize -->
+						<Button Classes="titlebar"
+                                Click="TitleBar_Minimize"
+                                ToolTip.Tip="Minimize">
+							<TextBlock Text="─" FontSize="10"
+                                       Foreground="{DynamicResource MutedBrush}" />
+						</Button>
 
+						<!-- Maximize / Restore -->
+						<Button Classes="titlebar"
+                                Click="TitleBar_MaximizeRestore"
+                                ToolTip.Tip="Maximize">
+							<TextBlock x:Name="MaxIcon" Text="□" FontSize="12"
+                                       Foreground="{DynamicResource MutedBrush}" />
+						</Button>
+
+						<!-- Close -->
+						<Button Classes="titlebar close"
+                                Click="TitleBar_Close"
+                                ToolTip.Tip="Close">
+							<TextBlock Text="×" FontSize="14"
+                                       Foreground="{DynamicResource MutedBrush}" />
+						</Button>
+					</StackPanel>
+
+					<!-- Spacer -->
+					<TextBlock />
+				</DockPanel>
+			</Border>
+
+			<!-- ── Navigation Bar ─────────────────────── -->
+			<Border Grid.Row="1"
+                    Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="0,8">
+				<DockPanel Margin="16,0">
+					<TextBlock Text="tarea"
+                               FontSize="15"
+                               Foreground="{DynamicResource RoseBrush}"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Left" />
+
+					<StackPanel Orientation="Horizontal"
+                                DockPanel.Dock="Right"
+                                Margin="0,0,8,0">
+						<Button Content="casa"
+                                Classes="nav"
+                                Click="NavCasa_Click" />
+						<Button Content="settings"
+                                Classes="nav"
+                                Click="NavSettings_Click" />
+					</StackPanel>
+
+					<!-- Context Indicator -->
+					<TextBlock x:Name="NavContext"
+                               FontSize="14"
+                               Foreground="{DynamicResource RoseBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+				</DockPanel>
+			</Border>
+
+			<!-- ── Content Area ─────────────────────────── -->
+			<ContentControl x:Name="ContentArea" Grid.Row="2" />
+
+			<!-- ── Footer ───────────────────────────────── -->
+			<Border Grid.Row="3"
+                    Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="16,6">
+				<DockPanel>
+					<TextBlock DockPanel.Dock="Left"
+                               Foreground="{DynamicResource MutedBrush}"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               Text="made by _nickyv" />
+
+					<StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                DockPanel.Dock="Right">
+						<TextBlock x:Name="StatTotal"
+                                   Foreground="{DynamicResource MutedBrush}"
+                                   FontSize="12" Margin="0,0,16,0"
+                                   VerticalAlignment="Center" />
+						<TextBlock x:Name="StatActive"
+                                   Foreground="{DynamicResource MutedBrush}"
+                                   FontSize="12" Margin="0,0,16,0"
+                                   VerticalAlignment="Center" />
+						<TextBlock x:Name="StatDone"
+                                   Foreground="{DynamicResource MutedBrush}"
+                                   FontSize="12"
+                                   VerticalAlignment="Center" />
+					</StackPanel>
+				</DockPanel>
+			</Border>
+
+			<!-- ── Boot Sequence Overlay ────────────────────── -->
+			<Border x:Name="BootOverlay"
+                    Grid.Row="0" Grid.RowSpan="4"
+                    Background="{DynamicResource BlackBrush}"
+                    ZIndex="100"
+                    IsVisible="True">
+				<StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,40">
+					<TextBlock x:Name="BootLine1"
+                               FontSize="13"
+                               Foreground="{DynamicResource MutedBrush}"
+                               Margin="0,0,0,4"
+                               IsVisible="False" />
+					<TextBlock x:Name="BootLine2"
+                               FontSize="13"
+                               Foreground="{DynamicResource MutedBrush}"
+                               Margin="0,0,0,4"
+                               IsVisible="False" />
+					<TextBlock x:Name="BootLine3"
+                               FontSize="13"
+                               Foreground="{DynamicResource MutedBrush}"
+                               Margin="0,0,0,4"
+                               IsVisible="False" />
+					<TextBlock x:Name="BootLine4"
+                               FontSize="13"
+                               Foreground="{DynamicResource MutedBrush}"
+                               Margin="0,0,0,4"
+                               IsVisible="False" />
+					<TextBlock x:Name="BootLine5"
+                               FontSize="16"
+                               Foreground="{DynamicResource RoseBrush}"
+                               Margin="0,12,0,0"
+                               IsVisible="False" />
+				</StackPanel>
+			</Border>
+
+			<!-- ── Scanline Overlay ────────────────────── -->
+			<Canvas x:Name="ScanlineOverlay"
+                    Grid.Row="0" Grid.RowSpan="4"
+                    ZIndex="90"
+                    IsHitTestVisible="False"
+                    Opacity="0.03" />
+
+			<!-- ── Vignette Overlay ────────────────────── -->
+			<Border x:Name="VignetteOverlay"
+                    Grid.Row="0" Grid.RowSpan="4"
+                    ZIndex="89"
+                    IsHitTestVisible="False"
+                    Opacity="0.6">
+				<Border.Background>
+					<RadialGradientBrush Center="50%,50%" RadiusX="0.75" RadiusY="0.75">
+						<GradientStop Color="Transparent" Offset="0.0" />
+						<GradientStop Color="Transparent" Offset="0.55" />
+						<GradientStop Color="#40000000" Offset="0.85" />
+						<GradientStop Color="#90000000" Offset="1.0" />
+					</RadialGradientBrush>
+				</Border.Background>
+			</Border>
+		</Grid>
+	</Border>
 </Window>

@@ -32,6 +32,9 @@ public partial class CardNoteViewModel : ObservableObject
     [ObservableProperty]
     private string _editText = string.Empty;
 
+    public string NoteForegroundKey => IsCrossedOut ? "MutedBrush" : "RoseBrush";
+    public bool ShowStrikethrough => IsCrossedOut;
+
     public CardNoteViewModel(CardNote note, DataService dataService, string cardId, Action refreshParent)
     {
         _note = note;
@@ -46,6 +49,8 @@ public partial class CardNoteViewModel : ObservableObject
     {
         _dataService.ToggleNoteCrossedOut(_cardId, _note.Id);
         IsCrossedOut = !IsCrossedOut;
+        OnPropertyChanged(nameof(NoteForegroundKey));
+        OnPropertyChanged(nameof(ShowStrikethrough));
     }
 
     public void Select()

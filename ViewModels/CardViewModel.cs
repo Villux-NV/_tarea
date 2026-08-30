@@ -44,10 +44,16 @@ public partial class CardViewModel : ObservableObject
     public int Order => _card.Order;
     public bool HasDueDate => _card.DueDate.HasValue;
     public DateTime? CompletedAtRaw => _card.CompletedAt;
+    public int CardWidth => _dataService.Settings.CardWidth;
+    public int CardHeight => _dataService.Settings.CardHeight;
 
     public string DueDateDisplay => _card.DueDate.HasValue
         ? _card.DueDate.Value.ToString("MMM dd")
         : "no due date";
+
+    public string DueDateBrushKey => IsPastDue ? "OrangeBrush"
+        : IsDueDateWarning ? "YellowBrush"
+        : "MutedBrush";
 
     public bool IsDueDateWarning
     {
@@ -82,6 +88,7 @@ public partial class CardViewModel : ObservableObject
             OnPropertyChanged(nameof(DueDateDisplay));
             OnPropertyChanged(nameof(HasDueDate));
             OnPropertyChanged(nameof(IsDueDateWarning));
+            OnPropertyChanged(nameof(DueDateBrushKey));
             OnPropertyChanged(nameof(IsPastDue));
             IsDatePickerOpen = false;
         }
@@ -232,6 +239,7 @@ public partial class CardViewModel : ObservableObject
         OnPropertyChanged(nameof(HasDueDate));
         OnPropertyChanged(nameof(IsDueDateWarning));
         OnPropertyChanged(nameof(IsPastDue));
+        OnPropertyChanged(nameof(DueDateBrushKey));
         IsDatePickerOpen = false;
     }
 

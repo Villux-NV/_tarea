@@ -1,0 +1,314 @@
+<UserControl x:Class="Tarea.Views.CasaView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:Tarea.Converters"
+             xmlns:vm="clr-namespace:Tarea.ViewModels"
+             x:DataType="vm:CasaViewModel"
+             Background="{DynamicResource BlackBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ── Room Cards Grid ──────────────────────────── -->
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl x:Name="RoomCardsControl"
+                          ItemsSource="{Binding Rooms}"
+                          Margin="24,16">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel HorizontalAlignment="Left" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:RoomSummary">
+                        <!-- Outer container with hover scale -->
+                        <Border Tag="CardRoot"
+                                Classes="card-hover"
+                                Width="{Binding CardWidth}"
+                                Height="{Binding CardHeight}"
+                                Margin="12"
+                                Background="Transparent"
+                                Cursor="Hand"
+                                PointerPressed="Card_PointerPressed"
+                                PointerMoved="Card_PointerMoved"
+                                PointerEntered="Card_PointerEntered"
+                                PointerExited="Card_PointerExited">
+                            <Grid>
+                                <!-- ══ FRONT ══ -->
+                                <Border x:Name="CardFront"
+                                        Background="{DynamicResource BlackBrush}"
+                                        BorderBrush="{DynamicResource RoseBrush}"
+                                        BorderThickness="1"
+                                        Padding="8"
+                                        RenderTransformOrigin="50%,50%">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="1" />
+                                    </Border.RenderTransform>
+
+                                    <Grid RowDefinitions="Auto,*,Auto">
+
+                                        <!-- Header: title + drag handle -->
+                                        <DockPanel Grid.Row="0" Margin="4,4,4,8">
+                                            <TextBlock Text="///"
+                                                       Tag="CardDragHandle"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="{DynamicResource MutedBrush}"
+                                                       FontSize="12"
+                                                       VerticalAlignment="Center"
+                                                       Cursor="Hand" />
+
+                                            <Border ClipToBounds="True"
+                                                    PointerEntered="CardTitle_PointerEntered"
+                                                    PointerExited="CardTitle_PointerExited">
+                                                <TextBlock Text="{Binding Title}"
+                                                           FontSize="15"
+                                                           TextTrimming="CharacterEllipsis">
+                                                    <TextBlock.RenderTransform>
+                                                        <TranslateTransform X="0" />
+                                                    </TextBlock.RenderTransform>
+                                                </TextBlock>
+                                            </Border>
+                                        </DockPanel>
+
+                                        <!-- Middle: card titles list -->
+                                        <Border Grid.Row="1"
+                                                BorderBrush="{DynamicResource RoseBrush}"
+                                                BorderThickness="1"
+                                                Margin="4,0"
+                                                Padding="8">
+                                            <Grid RowDefinitions="*,Auto">
+                                                <ScrollViewer Grid.Row="0"
+                                                              VerticalScrollBarVisibility="Auto"
+                                                              HorizontalScrollBarVisibility="Disabled">
+                                                    <ItemsControl ItemsSource="{Binding CardTitles}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="vm:CardTitleInfo">
+                                                                <Panel>
+                                                                    <!-- Section header -->
+                                                                    <TextBlock Text="{Binding HeaderText}"
+                                                                               FontSize="9"
+                                                                               Margin="0,3,0,1"
+                                                                               Foreground="{Binding ForegroundBrushKey, Converter={StaticResource ResourceKeyToBrush}}"
+                                                                               IsVisible="{Binding IsStatusHeader}" />
+
+                                                                    <!-- Card title -->
+                                                                    <TextBlock Text="{Binding Title}"
+                                                                               FontSize="11"
+                                                                               TextTrimming="CharacterEllipsis"
+                                                                               Margin="0,1"
+                                                                               Foreground="{Binding ForegroundBrushKey, Converter={StaticResource ResourceKeyToBrush}}"
+                                                                               TextDecorations="{Binding IsStrikethrough, Converter={x:Static conv:StrikethroughConverter.Instance}}"
+                                                                               IsVisible="{Binding !IsStatusHeader}" />
+                                                                </Panel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </ScrollViewer>
+
+                                                <!-- Card count -->
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding CardCount, StringFormat='── {0} ──'}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           HorizontalAlignment="Center"
+                                                           Margin="0,6,0,0" />
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Footer: quick add + flip -->
+                                        <DockPanel Grid.Row="2" Margin="4,8,4,4">
+                                            <Button Content="⟲"
+                                                    Classes="ghost"
+                                                    FontSize="16"
+                                                    DockPanel.Dock="Right"
+                                                    Click="FlipCard_Click"
+                                                    Tag="front" />
+
+                                            <!-- Quick add button (visible when NOT adding) -->
+											<Button Tag="QuickAddArea"
+                                                    DockPanel.Dock="Left"
+                                                    Cursor="Hand"
+                                                    IsVisible="{Binding !IsQuickAdding}"
+                                                    Click="ShowQuickAdd_Click">
+												<Button.Template>
+													<ControlTemplate>
+														<Border Background="Transparent" Padding="2,0">
+															<StackPanel Orientation="Horizontal" Spacing="4">
+																<TextBlock Text="+"
+                                                                           FontSize="14"
+                                                                           Foreground="{DynamicResource MutedBrush}"
+                                                                           VerticalAlignment="Center" />
+																<TextBlock Text="card"
+                                                                           FontSize="11"
+                                                                           Foreground="{DynamicResource MutedBrush}"
+                                                                           VerticalAlignment="Center" />
+															</StackPanel>
+														</Border>
+													</ControlTemplate>
+												</Button.Template>
+											</Button>
+
+                                            <!-- Quick add input (visible when adding) -->
+                                            <Border Tag="QuickAddArea"
+                                                    DockPanel.Dock="Left"
+                                                    IsVisible="{Binding IsQuickAdding}">
+                                                <TextBox x:Name="QuickAddInput"
+                                                         Text="{Binding QuickAddTitle}"
+                                                         FontSize="11"
+                                                         BorderThickness="0,0,0,1"
+                                                         BorderBrush="{DynamicResource RoseBrush}"
+                                                         Padding="2,2"
+                                                         Width="140"
+                                                         KeyDown="QuickAddInput_KeyDown"
+                                                         AttachedToVisualTree="InputField_AttachedToVisualTree" />
+                                            </Border>
+
+                                            <TextBlock />
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+
+
+                                <!-- ══ BACK ══ -->
+                                <Border x:Name="CardBack"
+                                        Background="{DynamicResource BlackBrush}"
+                                        BorderBrush="{DynamicResource RoseBrush}"
+                                        BorderThickness="1"
+                                        Padding="8"
+                                        RenderTransformOrigin="50%,50%">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="0" />
+                                    </Border.RenderTransform>
+
+                                    <Grid RowDefinitions="Auto,*,Auto">
+
+                                        <!-- Header -->
+                                        <DockPanel Grid.Row="0" Margin="4,4,4,8">
+                                            <Border ClipToBounds="True"
+                                                    PointerEntered="CardTitle_PointerEntered"
+                                                    PointerExited="CardTitle_PointerExited">
+                                                <TextBlock Text="{Binding Title}"
+                                                           FontSize="15"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           TextTrimming="CharacterEllipsis">
+                                                    <TextBlock.RenderTransform>
+                                                        <TranslateTransform X="0" />
+                                                    </TextBlock.RenderTransform>
+                                                </TextBlock>
+                                            </Border>
+                                        </DockPanel>
+
+                                        <!-- Details: description + summary -->
+                                        <Border Grid.Row="1"
+                                                BorderBrush="{DynamicResource RoseBrush}"
+                                                BorderThickness="1"
+                                                Margin="4,0"
+                                                Padding="8">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding ProgressSummary}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           Margin="0,0,0,8" />
+
+                                                <!-- Description (display) -->
+                                                <Border Tag="DescriptionArea"
+                                                        Margin="0,0,0,8"
+                                                        Padding="0,0,0,6"
+                                                        BorderBrush="{DynamicResource MutedBrush}"
+                                                        BorderThickness="0,0,0,0.5"
+                                                        PointerPressed="Description_PointerPressed"
+                                                        IsVisible="{Binding !IsEditingDescription}">
+                                                    <TextBlock Text="{Binding DescriptionDisplay}"
+                                                               FontSize="11"
+                                                               TextWrapping="Wrap"
+                                                               Cursor="Hand"
+                                                               Foreground="{DynamicResource RoseBrush}"
+                                                               FontStyle="{Binding IsDescriptionPlaceholder, Converter={x:Static conv:PlaceholderFontStyleConverter.Instance}}"
+                                                               Opacity="{Binding IsDescriptionPlaceholder, Converter={x:Static conv:PlaceholderOpacityConverter.Instance}}" />
+                                                </Border>
+
+                                                <!-- Description (edit) -->
+                                                <Border Tag="DescriptionArea"
+                                                        Margin="0,0,0,8"
+                                                        IsVisible="{Binding IsEditingDescription}">
+                                                    <TextBox Text="{Binding EditDescriptionText}"
+                                                             FontSize="11"
+                                                             TextWrapping="Wrap"
+                                                             AcceptsReturn="False"
+                                                             BorderThickness="0,0,0,1"
+                                                             BorderBrush="{DynamicResource RoseBrush}"
+                                                             Padding="2,2"
+                                                             MaxHeight="80"
+                                                             KeyDown="DescriptionEdit_KeyDown"
+                                                             AttachedToVisualTree="InputField_AttachedToVisualTree" />
+                                                </Border>
+
+                                                <!-- Stat counts -->
+                                                <TextBlock FontSize="12" Margin="0,0,0,4">
+                                                    <Run Text="cards: " Foreground="{DynamicResource MutedBrush}" />
+                                                    <Run Text="{Binding CardCount}" />
+                                                </TextBlock>
+                                                <TextBlock FontSize="12" Margin="0,0,0,4">
+                                                    <Run Text="todo: " Foreground="{DynamicResource MutedBrush}" />
+                                                    <Run Text="{Binding TodoCount}" />
+                                                </TextBlock>
+                                                <TextBlock FontSize="12" Margin="0,0,0,4">
+                                                    <Run Text="wip:  " Foreground="{DynamicResource MutedBrush}" />
+                                                    <Run Text="{Binding WipCount}" />
+                                                </TextBlock>
+                                                <TextBlock FontSize="12" Margin="0,0,0,4">
+                                                    <Run Text="done: " Foreground="{DynamicResource MutedBrush}" />
+                                                    <Run Text="{Binding DoneCount}" />
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Footer: delete + flip back -->
+                                        <DockPanel Grid.Row="2" Margin="4,8,4,4">
+                                            <Button Content="⟲"
+                                                    Classes="ghost"
+                                                    FontSize="16"
+                                                    DockPanel.Dock="Right"
+                                                    Click="FlipCard_Click"
+                                                    Tag="back" />
+											<Button Content="delete"
+                                                    Classes="danger"
+                                                    DockPanel.Dock="Left"
+                                                    Click="DeleteRoom_Click" />
+                                            <TextBlock />
+                                        </DockPanel>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ── Add Room Bar ─────────────────────────────── -->
+        <Border Grid.Row="1"
+                BorderBrush="{DynamicResource RoseBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,8">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBox x:Name="TxtAddRoom"
+                         Text="{Binding NewRoomTitle}"
+                         Width="200"
+                         FontSize="13"
+                         VerticalContentAlignment="Center"
+                         KeyDown="AddRoom_KeyDown" />
+
+                <Button Content="+ add room"
+                        Classes="primary"
+                        Command="{Binding AddRoomCommand}"
+                        Margin="8,0,0,0" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

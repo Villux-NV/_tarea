@@ -179,6 +179,9 @@ public partial class RoomSummary : ObservableObject
     public int DoneCount { get; }
     public List<CardTitleInfo> CardTitles { get; }
 
+    public int CardWidth => _dataService.Settings.CardWidth;
+    public int CardHeight => _dataService.Settings.CardHeight;
+
     [ObservableProperty]
     private string _description;
 
@@ -299,4 +302,14 @@ public class CardTitleInfo
     public CardStatus Status { get; set; }
     public bool IsStatusHeader { get; set; }
     public string HeaderText { get; set; } = string.Empty;
+
+    // ── Computed display properties (replace WPF DataTriggers) ──
+    public string ForegroundBrushKey => IsStatusHeader
+        ? (Status == CardStatus.Done ? "GreenBrush" : "MutedBrush")
+        : IsPastDue ? "OrangeBrush"
+        : IsDueDateWarning ? "YellowBrush"
+        : Status == CardStatus.Done ? "GreenBrush"
+        : "MutedBrush";
+
+    public bool IsStrikethrough => !IsStatusHeader && Status == CardStatus.Done;
 }
