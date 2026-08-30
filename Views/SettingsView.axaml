@@ -1,0 +1,808 @@
+<UserControl x:Class="Tarea.Views.SettingsView"
+            xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:conv="clr-namespace:Tarea.Converters"
+            xmlns:local="clr-namespace:Tarea.Views"
+            Background="{DynamicResource BlackBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="40,24">
+        <StackPanel MaxWidth="600">
+
+            <!-- ── Title ────────────────────────────────── -->
+            <TextBlock Text="settings"
+                       FontSize="20"
+                       Margin="0,0,0,24" />
+
+            <!-- ════════════════════════════════════════════ -->
+            <!-- ── APPEARANCE ──────────────────────────── -->
+            <!-- ════════════════════════════════════════════ -->
+            <TextBlock Text="appearance"
+                       FontSize="15"
+                       Margin="0,0,0,12" />
+
+            <!-- Theme Preset -->
+            <TextBlock Text="theme"
+                       Foreground="{DynamicResource MutedBrush}"
+                       FontSize="12"
+                       Margin="0,0,0,8" />
+
+            <StackPanel x:Name="ThemePanel" Orientation="Horizontal" Margin="0,0,0,8">
+                <Border x:Name="ThemeRose" Width="120" Height="64" Margin="0,0,8,0"
+                        Background="#0C0002" BorderThickness="2" Cursor="Hand"
+                        PointerPressed="ThemePreset_Click" Tag="Rose">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="rose" FontSize="13" Foreground="#E8B4B8"
+                                   HorizontalAlignment="Center" FontFamily="Consolas" />
+                        <TextBlock Text="terminal" FontSize="10" Foreground="#665E5F"
+                                   HorizontalAlignment="Center" FontFamily="Consolas" />
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="ThemeAmber" Width="120" Height="64" Margin="0,0,8,0"
+                        Background="#080600" BorderThickness="2" Cursor="Hand"
+                        PointerPressed="ThemePreset_Click" Tag="Amber">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="amber" FontSize="13" Foreground="#FFB830"
+                                   HorizontalAlignment="Center" FontFamily="Consolas" />
+                        <TextBlock Text="phosphor" FontSize="10" Foreground="#7A6830"
+                                   HorizontalAlignment="Center" FontFamily="Consolas" />
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="ThemeIntegrale" Width="120" Height="64" Margin="0,0,8,0"
+                        Background="#080C18" BorderThickness="2" Cursor="Hand"
+                        PointerPressed="ThemePreset_Click" Tag="Integrale">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="integrale" FontSize="13" Foreground="#EDE8E0"
+                                   HorizontalAlignment="Center" FontFamily="Consolas" />
+                        <TextBlock Text="martini" FontSize="10" Foreground="#5C6478"
+                                   HorizontalAlignment="Center" FontFamily="Consolas" />
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="ThemeCustom" Width="120" Height="64" Margin="0,0,8,0"
+                        Background="#1A1A1A" BorderThickness="2" Cursor="Hand"
+                        PointerPressed="ThemePreset_Click" Tag="Custom">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="custom" FontSize="13" Foreground="#AAAAAA"
+                                   HorizontalAlignment="Center" FontFamily="Consolas" />
+                        <TextBlock Text="your palette" FontSize="10" Foreground="#666666"
+                                   HorizontalAlignment="Center" FontFamily="Consolas" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Saved custom presets -->
+            <ItemsControl x:Name="SavedThemesList" Margin="0,8,0,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="local:SavedThemeItem">
+                        <Border Width="120" Height="64" Margin="0,0,8,8"
+                                BorderThickness="2" Cursor="Hand"
+                                BorderBrush="{DynamicResource MutedBrush}"
+                                PointerPressed="SavedTheme_Click"
+                                Tag="{Binding Name}"
+                                Background="{Binding BackgroundHex, Converter={StaticResource StringToBrush}}">
+                            <Grid>
+                                <StackPanel VerticalAlignment="Center"
+                                            HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontSize="13"
+                                               HorizontalAlignment="Center"
+                                               FontFamily="Consolas"
+                                               Foreground="{Binding ForegroundHex, Converter={StaticResource StringToBrush}}" />
+                                    <TextBlock Text="saved" FontSize="10"
+                                               HorizontalAlignment="Center"
+                                               FontFamily="Consolas"
+                                               Foreground="{Binding MutedHex, Converter={StaticResource StringToBrush}}" />
+                                </StackPanel>
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,2,4,0"
+                                        Cursor="Hand"
+                                        Click="DeleteSavedTheme_Click"
+                                        Tag="{Binding Name}">
+                                    <Button.Template>
+                                        <ControlTemplate>
+                                            <Border Background="Transparent" Padding="2,0">
+                                                <TextBlock Text="×" FontSize="10"
+                                                           Foreground="{DynamicResource MutedBrush}" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Custom Theme Editor -->
+            <StackPanel x:Name="CustomThemeEditor" IsVisible="False" Margin="0,8,0,16">
+                <TextBlock Text="custom palette — enter hex colors"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,4" />
+
+                <TextBlock Text="start from preset:"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="11"
+                           Margin="0,0,0,6" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <Button Content="rose" Classes="primary"
+                            FontSize="11" Padding="10,4" Margin="0,0,6,0"
+                            Click="CopyPresetToCustom_Click" Tag="Rose" />
+                    <Button Content="amber" Classes="primary"
+                            FontSize="11" Padding="10,4" Margin="0,0,6,0"
+                            Click="CopyPresetToCustom_Click" Tag="Amber" />
+                    <Button Content="integrale" Classes="primary"
+                            FontSize="11" Padding="10,4" Margin="0,0,6,0"
+                            Click="CopyPresetToCustom_Click" Tag="Integrale" />
+                </StackPanel>
+
+                <ItemsControl x:Name="CustomColorList">
+                    <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="local:CustomColorItem">
+                            <Border Background="{DynamicResource BlackBrush}"
+                                    BorderBrush="{DynamicResource MutedBrush}"
+                                    BorderThickness="0,0,0,0.5"
+                                    Padding="8,6"
+                                    Margin="0,0,0,2">
+                                <DockPanel>
+                                    <Border Width="24" Height="24"
+                                            Background="{Binding Hex, Converter={StaticResource StringToBrush}}"
+                                            BorderBrush="{DynamicResource MutedBrush}"
+                                            BorderThickness="1"
+                                            DockPanel.Dock="Left"
+                                            Margin="0,0,10,0" />
+
+                                    <StackPanel DockPanel.Dock="Left"
+                                                VerticalAlignment="Center"
+                                                Width="130">
+                                        <TextBlock Text="{Binding Label}" FontSize="12" />
+                                        <TextBlock Text="{Binding Key}" FontSize="10"
+                                                   Foreground="{DynamicResource MutedBrush}" />
+                                    </StackPanel>
+
+                                    <TextBox Text="{Binding Hex}"
+                                             Width="90"
+                                             FontSize="12"
+                                             FontFamily="Consolas"
+                                             Padding="4,3"
+                                             DockPanel.Dock="Right"
+                                             HorizontalAlignment="Right" />
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Button Content="apply custom theme"
+                        Classes="primary"
+                        Click="ApplyCustomTheme_Click"
+                        HorizontalAlignment="Left"
+                        Margin="0,12,0,0" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                    <TextBox x:Name="TxtSaveThemeName"
+                             Width="160"
+                             FontSize="12"
+                             FontFamily="Consolas"
+                             Padding="4,3"
+                             VerticalContentAlignment="Center" />
+                    <Button Content="save as preset"
+                            Classes="primary"
+                            FontSize="11" Padding="10,4" Margin="6,0,0,0"
+                            Click="SaveCustomPreset_Click" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Card Size -->
+            <TextBlock Text="card size"
+                       Foreground="{DynamicResource MutedBrush}"
+                       FontSize="12"
+                       Margin="0,0,0,8" />
+
+            <StackPanel x:Name="CardSizePanel" Orientation="Horizontal" Margin="0,0,0,4">
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="CardSize_Click"
+                        Tag="Compact" x:Name="SizeCompact">
+                    <TextBlock Text="compact" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="CardSize_Click"
+                        Tag="Default" x:Name="SizeDefault">
+                    <TextBlock Text="default" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="CardSize_Click"
+                        Tag="Large" x:Name="SizeLarge">
+                    <TextBlock Text="large" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="CardSize_Click"
+                        Tag="Custom" x:Name="SizeCustom">
+                    <TextBlock Text="custom" FontSize="12" />
+                </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="CustomSizePanel" Orientation="Horizontal"
+                        IsVisible="False" Margin="0,8,0,16">
+                <TextBlock Text="w:" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MutedBrush}" Margin="0,0,4,0" />
+                <TextBox x:Name="TxtCardWidth" Width="60" FontSize="12"
+                         Padding="4,3" VerticalContentAlignment="Center" />
+                <TextBlock Text="h:" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MutedBrush}" Margin="12,0,4,0" />
+                <TextBox x:Name="TxtCardHeight" Width="60" FontSize="12"
+                         Padding="4,3" VerticalContentAlignment="Center" />
+                <Button Content="apply" Classes="primary"
+                        FontSize="11" Padding="10,4" Margin="12,0,0,0"
+                        Click="CustomCardSize_Click" />
+            </StackPanel>
+
+            <!-- Font size -->
+            <TextBlock Text="font size"
+                       Foreground="{DynamicResource MutedBrush}"
+                       FontSize="12"
+                       Margin="0,0,0,8" />
+
+            <StackPanel x:Name="FontSizePanel" Orientation="Horizontal" Margin="0,0,0,16">
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="FontSize_Click"
+                        Tag="12" x:Name="FontSmall">
+                    <TextBlock Text="small" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="FontSize_Click"
+                        Tag="14" x:Name="FontDefault">
+                    <TextBlock Text="default" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="FontSize_Click"
+                        Tag="16" x:Name="FontLarge">
+                    <TextBlock Text="large" FontSize="12" />
+                </Border>
+            </StackPanel>
+
+            <!-- ── Divider ──────────────────────────────── -->
+            <Border BorderBrush="{DynamicResource MutedBrush}"
+                    BorderThickness="0,0,0,1"
+                    Margin="0,8,0,24" />
+
+            <!-- ════════════════════════════════════════════ -->
+            <!-- ── BEHAVIOR ────────────────────────────── -->
+            <!-- ════════════════════════════════════════════ -->
+            <TextBlock Text="behavior"
+                       FontSize="15"
+                       Margin="0,0,0,12" />
+
+            <!-- Confirm on room delete -->
+            <Border Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="1"
+                    Padding="12,10"
+                    Margin="0,0,0,8">
+                <DockPanel>
+                    <TextBlock Text="confirm before deleting rooms"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Left" />
+                    <CheckBox x:Name="ChkConfirmDelete"
+                              DockPanel.Dock="Right"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              IsCheckedChanged="ConfirmDelete_Changed" />
+                </DockPanel>
+            </Border>
+
+            <!-- Confirm on card delete -->
+            <Border Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="1"
+                    Padding="12,10"
+                    Margin="0,0,0,8">
+                <DockPanel>
+                    <TextBlock Text="confirm before deleting cards"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Left" />
+                    <CheckBox x:Name="ChkConfirmCardDelete"
+                              DockPanel.Dock="Right"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              IsCheckedChanged="ConfirmCardDelete_Changed" />
+                </DockPanel>
+            </Border>
+
+            <!-- Hide on complete -->
+            <Border Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="1"
+                    Padding="12,10"
+                    Margin="0,0,0,8">
+                <DockPanel>
+                    <TextBlock Text="hide cards when marked done"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Left" />
+                    <CheckBox x:Name="ChkHideOnComplete"
+                              DockPanel.Dock="Right"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              IsCheckedChanged="HideOnComplete_Changed" />
+                </DockPanel>
+            </Border>
+
+            <!-- Hide delay -->
+            <StackPanel x:Name="HideDelayPanel" Margin="0,0,0,8" IsVisible="False">
+                <TextBlock Text="delay before hiding"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,8" />
+                <StackPanel x:Name="HideDelayOptions" Orientation="Horizontal">
+                    <Border Background="{DynamicResource BlackBrush}"
+                            BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                            Cursor="Hand" PointerPressed="HideDelay_Click"
+                            Tag="0" x:Name="Delay0">
+                        <TextBlock Text="instant" FontSize="12" />
+                    </Border>
+                    <Border Background="{DynamicResource BlackBrush}"
+                            BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                            Cursor="Hand" PointerPressed="HideDelay_Click"
+                            Tag="1" x:Name="Delay1">
+                        <TextBlock Text="1s" FontSize="12" />
+                    </Border>
+                    <Border Background="{DynamicResource BlackBrush}"
+                            BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                            Cursor="Hand" PointerPressed="HideDelay_Click"
+                            Tag="2" x:Name="Delay2">
+                        <TextBlock Text="2s" FontSize="12" />
+                    </Border>
+                    <Border Background="{DynamicResource BlackBrush}"
+                            BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                            Cursor="Hand" PointerPressed="HideDelay_Click"
+                            Tag="3" x:Name="Delay3">
+                        <TextBlock Text="3s" FontSize="12" />
+                    </Border>
+                    <Border Background="{DynamicResource BlackBrush}"
+                            BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                            Cursor="Hand" PointerPressed="HideDelay_Click"
+                            Tag="5" x:Name="Delay5">
+                        <TextBlock Text="5s" FontSize="12" />
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Boot sequence -->
+            <Border Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="1"
+                    Padding="12,10"
+                    Margin="0,0,0,8">
+                <DockPanel>
+                    <TextBlock Text="show boot sequence on startup"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Left" />
+                    <CheckBox x:Name="ChkBootSequence"
+                              DockPanel.Dock="Right"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              IsCheckedChanged="BootSequence_Changed" />
+                </DockPanel>
+            </Border>
+
+            <!-- Default card status -->
+            <TextBlock Text="default status for new cards"
+                       Foreground="{DynamicResource MutedBrush}"
+                       FontSize="12"
+                       Margin="0,12,0,8" />
+
+            <StackPanel x:Name="DefaultStatusPanel" Orientation="Horizontal" Margin="0,0,0,8">
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="DefaultStatus_Click"
+                        Tag="Todo" x:Name="StatusTodo">
+                    <TextBlock Text="todo" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="DefaultStatus_Click"
+                        Tag="Wip" x:Name="StatusWip">
+                    <TextBlock Text="wip" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="DefaultStatus_Click"
+                        Tag="Done" x:Name="StatusDone">
+                    <TextBlock Text="done" FontSize="12" />
+                </Border>
+            </StackPanel>
+
+            <!-- Custom status labels -->
+            <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+                <TextBlock Text="status labels"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="12" VerticalAlignment="Center"
+                           Margin="0,0,12,0" />
+                <Button Content="customize" Classes="ghost"
+                        FontSize="11" Padding="4,2"
+                        Click="ToggleStatusLabelEditor_Click" />
+            </StackPanel>
+
+            <StackPanel x:Name="StatusLabelEditorPanel" IsVisible="False"
+                        Margin="0,4,0,8">
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="todo:" FontSize="12" Width="50"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <TextBox x:Name="TxtTodoLabel" Width="100" FontSize="12"
+                             Padding="4,3" DockPanel.Dock="Left"
+                             MaxLength="12" />
+                </DockPanel>
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="wip:" FontSize="12" Width="50"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <TextBox x:Name="TxtWipLabel" Width="100" FontSize="12"
+                             Padding="4,3" DockPanel.Dock="Left"
+                             MaxLength="12" />
+                </DockPanel>
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="done:" FontSize="12" Width="50"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <TextBox x:Name="TxtDoneLabel" Width="100" FontSize="12"
+                             Padding="4,3" DockPanel.Dock="Left"
+                             MaxLength="12" />
+                </DockPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <Button Content="apply" Classes="primary"
+                            FontSize="11" Padding="10,4" Margin="0,0,8,0"
+                            Click="ApplyStatusLabels_Click" />
+                    <Button Content="reset" Classes="ghost"
+                            FontSize="11" Padding="10,4"
+                            Click="ResetStatusLabels_Click" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Due date warning -->
+            <TextBlock Text="due date warning threshold"
+                       Foreground="{DynamicResource MutedBrush}"
+                       FontSize="12"
+                       Margin="0,12,0,8" />
+
+            <StackPanel x:Name="DueDatePanel" Orientation="Horizontal" Margin="0,0,0,8">
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="DueDateWarning_Click"
+                        Tag="1" x:Name="DueDate1">
+                    <TextBlock Text="1 day" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="DueDateWarning_Click"
+                        Tag="3" x:Name="DueDate3">
+                    <TextBlock Text="3 days" FontSize="12" />
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}"
+                        BorderThickness="2" Padding="12,6" Margin="0,0,8,0"
+                        Cursor="Hand" PointerPressed="DueDateWarning_Click"
+                        Tag="7" x:Name="DueDate7">
+                    <TextBlock Text="7 days" FontSize="12" />
+                </Border>
+            </StackPanel>
+
+            <!-- Urgency tint colors -->
+            <TextBlock Text="urgency tint colors"
+                       Foreground="{DynamicResource MutedBrush}"
+                       FontSize="12"
+                       Margin="0,16,0,8" />
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <Border Width="24" Height="24" Margin="0,0,4,0" BorderThickness="1"
+                        BorderBrush="{DynamicResource MutedBrush}"
+                        x:Name="UrgencyLowPreview" />
+                <Border Width="24" Height="24" Margin="0,0,4,0" BorderThickness="1"
+                        BorderBrush="{DynamicResource MutedBrush}"
+                        x:Name="UrgencyMedPreview" />
+                <Border Width="24" Height="24" Margin="0,0,12,0" BorderThickness="1"
+                        BorderBrush="{DynamicResource MutedBrush}"
+                        x:Name="UrgencyHighPreview" />
+                <Button Content="customize" Classes="ghost"
+                        FontSize="11" Padding="4,2"
+                        Click="ToggleUrgencyEditor_Click" />
+            </StackPanel>
+
+            <StackPanel x:Name="UrgencyEditorPanel" IsVisible="False" Margin="0,8,0,8">
+                <TextBlock Text="ARGB hex — alpha controls subtlety (e.g. #18FBA824)"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="10"
+                           Margin="0,0,0,8" />
+
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="low" FontSize="12" Width="60"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <TextBox x:Name="TxtUrgencyLow" Width="110" FontSize="12"
+                             Padding="4,3" DockPanel.Dock="Left" />
+                </DockPanel>
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="medium" FontSize="12" Width="60"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <TextBox x:Name="TxtUrgencyMed" Width="110" FontSize="12"
+                             Padding="4,3" DockPanel.Dock="Left" />
+                </DockPanel>
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="high" FontSize="12" Width="60"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <TextBox x:Name="TxtUrgencyHigh" Width="110" FontSize="12"
+                             Padding="4,3" DockPanel.Dock="Left" />
+                </DockPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <Button Content="apply" Classes="primary"
+                            FontSize="11" Padding="10,4" Margin="0,0,8,0"
+                            Click="ApplyUrgencyColors_Click" />
+                    <Button Content="reset defaults" Classes="ghost"
+                            FontSize="11" Padding="10,4"
+                            Click="ResetUrgencyColors_Click" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ── Divider ──────────────────────────────── -->
+            <Border BorderBrush="{DynamicResource MutedBrush}"
+                    BorderThickness="0,0,0,1"
+                    Margin="0,24,0,24" />
+
+            <!-- ════════════════════════════════════════════ -->
+            <!-- ── KEYBOARD SHORTCUTS ─────────────────── -->
+            <!-- ════════════════════════════════════════════ -->
+            <TextBlock Text="keyboard shortcuts"
+                       FontSize="15"
+                       Margin="0,0,0,12" />
+
+            <Border Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="1"
+                    Padding="12,10"
+                    Margin="0,0,0,8">
+                <DockPanel>
+                    <TextBlock Text="enable keyboard shortcuts"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Left" />
+                    <CheckBox x:Name="ShortcutsToggle"
+                              DockPanel.Dock="Right"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              IsCheckedChanged="ShortcutsToggle_Changed" />
+                </DockPanel>
+            </Border>
+
+            <!-- Shortcut summary -->
+            <Border Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="1"
+                    Padding="12,8"
+                    Margin="0,0,0,4">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,4">
+                        <TextBlock Text="back / escape" FontSize="12"
+                                   Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="DisplayBack" FontSize="12"
+                                   DockPanel.Dock="Right" HorizontalAlignment="Right" />
+                    </DockPanel>
+                    <DockPanel Margin="0,0,0,4">
+                        <TextBlock Text="quick add" FontSize="12"
+                                   Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="DisplayQuickAdd" FontSize="12"
+                                   DockPanel.Dock="Right" HorizontalAlignment="Right" />
+                    </DockPanel>
+                    <DockPanel Margin="0,0,0,4">
+                        <TextBlock Text="settings" FontSize="12"
+                                   Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="DisplaySettings" FontSize="12"
+                                   DockPanel.Dock="Right" HorizontalAlignment="Right" />
+                    </DockPanel>
+                    <DockPanel Margin="0,0,0,4">
+                        <TextBlock Text="jump to room" FontSize="12"
+                                   Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="1-9" FontSize="12"
+                                   DockPanel.Dock="Right" HorizontalAlignment="Right" />
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock Text="scroll page" FontSize="12"
+                                   Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="↑ ↓" FontSize="12"
+                                   DockPanel.Dock="Right" HorizontalAlignment="Right" />
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+
+            <Button Content="customize" Classes="ghost"
+                    FontSize="11" Padding="4,2"
+                    HorizontalAlignment="Left"
+                    Margin="0,4,0,0"
+                    Click="ToggleShortcutEditor_Click" />
+
+            <!-- Rebinding editor -->
+            <StackPanel x:Name="ShortcutEditorPanel" IsVisible="False"
+                        Margin="0,8,0,0">
+                <TextBlock Text="click a key button, then press the new key"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="10"
+                           Margin="0,0,0,8" />
+
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="back:" FontSize="12" Width="80"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <Button x:Name="BindBack" Content="Esc"
+                            FontFamily="Consolas" FontSize="12"
+                            Background="Transparent"
+                            Foreground="{DynamicResource RoseBrush}"
+                            BorderBrush="{DynamicResource RoseBrush}"
+                            BorderThickness="1" Padding="8,3"
+                            Click="RebindShortcut_Click"
+                            Tag="ShortcutBack"
+                            KeyDown="RebindShortcut_KeyDown" />
+                </DockPanel>
+
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="quick add:" FontSize="12" Width="80"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <Button x:Name="BindQuickAdd" Content="N"
+                            FontFamily="Consolas" FontSize="12"
+                            Background="Transparent"
+                            Foreground="{DynamicResource RoseBrush}"
+                            BorderBrush="{DynamicResource RoseBrush}"
+                            BorderThickness="1" Padding="8,3"
+                            Click="RebindShortcut_Click"
+                            Tag="ShortcutQuickAdd"
+                            KeyDown="RebindShortcut_KeyDown" />
+                </DockPanel>
+
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="settings:" FontSize="12" Width="80"
+                               VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <Button x:Name="BindSettings" Content="S"
+                            FontFamily="Consolas" FontSize="12"
+                            Background="Transparent"
+                            Foreground="{DynamicResource RoseBrush}"
+                            BorderBrush="{DynamicResource RoseBrush}"
+                            BorderThickness="1" Padding="8,3"
+                            Click="RebindShortcut_Click"
+                            Tag="ShortcutSettings"
+                            KeyDown="RebindShortcut_KeyDown" />
+                </DockPanel>
+            </StackPanel>
+
+            <!-- ── Divider ──────────────────────────────── -->
+            <Border BorderBrush="{DynamicResource MutedBrush}"
+                    BorderThickness="0,0,0,1"
+                    Margin="0,24,0,24" />
+
+            <!-- ═══════════════════════════════════════════ -->
+            <!-- ANIMATIONS                                  -->
+            <!-- ═══════════════════════════════════════════ -->
+            <TextBlock Text="── animations ──"
+                       Foreground="{DynamicResource MutedBrush}"
+                       FontSize="14"
+                       Margin="0,24,0,12" />
+
+            <Border Background="{DynamicResource BlackBrush}"
+                    BorderBrush="{DynamicResource RoseBrush}"
+                    BorderThickness="1"
+                    Padding="12,10"
+                    Margin="0,0,0,8">
+                <DockPanel>
+                    <TextBlock Text="enable animations" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                    <CheckBox x:Name="ChkAnimMaster" DockPanel.Dock="Right"
+                              HorizontalAlignment="Right" VerticalAlignment="Center"
+                              IsCheckedChanged="AnimMaster_Changed" />
+                </DockPanel>
+            </Border>
+
+            <StackPanel x:Name="AnimTogglesPanel" Margin="16,0,0,0">
+                <Border Background="{DynamicResource BlackBrush}" BorderBrush="{DynamicResource RoseBrush}"
+                        BorderThickness="1" Padding="12,10" Margin="0,0,0,6">
+                    <DockPanel>
+                        <TextBlock Text="scanline overlay" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                        <CheckBox x:Name="ChkAnimScanlines" DockPanel.Dock="Right"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  IsCheckedChanged="AnimToggle_Changed" />
+                    </DockPanel>
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}" BorderBrush="{DynamicResource RoseBrush}"
+                        BorderThickness="1" Padding="12,10" Margin="0,0,0,6">
+                    <DockPanel>
+                        <TextBlock Text="vignette effect" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                        <CheckBox x:Name="ChkAnimVignette" DockPanel.Dock="Right"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  IsCheckedChanged="AnimToggle_Changed" />
+                    </DockPanel>
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}" BorderBrush="{DynamicResource RoseBrush}"
+                        BorderThickness="1" Padding="12,10" Margin="0,0,0,6">
+                    <DockPanel>
+                        <TextBlock Text="card hover scale" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                        <CheckBox x:Name="ChkAnimHoverScale" DockPanel.Dock="Right"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  IsCheckedChanged="AnimToggle_Changed" />
+                    </DockPanel>
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}" BorderBrush="{DynamicResource RoseBrush}"
+                        BorderThickness="1" Padding="12,10" Margin="0,0,0,6">
+                    <DockPanel>
+                        <TextBlock Text="done pulse" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                        <CheckBox x:Name="ChkAnimDonePulse" DockPanel.Dock="Right"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  IsCheckedChanged="AnimToggle_Changed" />
+                    </DockPanel>
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}" BorderBrush="{DynamicResource RoseBrush}"
+                        BorderThickness="1" Padding="12,10" Margin="0,0,0,6">
+                    <DockPanel>
+                        <TextBlock Text="smooth card hide" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                        <CheckBox x:Name="ChkAnimSmoothHide" DockPanel.Dock="Right"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  IsCheckedChanged="AnimToggle_Changed" />
+                    </DockPanel>
+                </Border>
+                <Border Background="{DynamicResource BlackBrush}" BorderBrush="{DynamicResource RoseBrush}"
+                        BorderThickness="1" Padding="12,10" Margin="0,0,0,6">
+                    <DockPanel>
+                        <TextBlock Text="footer typewriter" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                        <CheckBox x:Name="ChkAnimTypewriter" DockPanel.Dock="Right"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  IsCheckedChanged="AnimToggle_Changed" />
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ── Divider ──────────────────────────────── -->
+            <Border BorderBrush="{DynamicResource MutedBrush}"
+                    BorderThickness="0,0,0,1"
+                    Margin="0,24,0,24" />
+
+            <!-- ════════════════════════════════════════════ -->
+            <!-- ── DATA ────────────────────────────────── -->
+            <!-- ════════════════════════════════════════════ -->
+            <TextBlock Text="data"
+                       FontSize="15"
+                       Margin="0,0,0,8" />
+
+            <TextBlock x:Name="TxtDataPath"
+                       Foreground="{DynamicResource MutedBrush}"
+                       FontSize="12"
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,8" />
+
+            <StackPanel Orientation="Horizontal">
+                <Button Content="open data folder"
+                        Classes="primary"
+                        Click="OpenDataFolder_Click" />
+                <Button Content="export to markdown"
+                        Classes="primary"
+                        Click="ExportMarkdown_Click"
+                        Margin="8,0,0,0" />
+            </StackPanel>
+
+            <!-- ── About ────────────────────────────────── -->
+            <Border BorderBrush="{DynamicResource MutedBrush}"
+                    BorderThickness="0,0,0,1"
+                    Margin="0,24,0,24" />
+
+            <TextBlock Foreground="{DynamicResource MutedBrush}" FontSize="12">
+                <Run Text="tarea — retro take on a modern solution" />
+            </TextBlock>
+            <TextBlock Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,4,0,0">
+                <Run Text="v1.0.0 — .net 8 / avalonia" />
+            </TextBlock>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -22,7 +22,7 @@ public partial class MainWindow : Window
 
     private CasaView? _casaView;
     private RoomView? _roomView; 
-    private UserControl? _settingsView;
+    private SettingsView? _settingsView;
 
     private string _currentPage = "Casa";
     private string _previousPage = "Casa";
@@ -210,7 +210,9 @@ public partial class MainWindow : Window
                 break;
             case "Settings":
                 NavContext.Text = "";
-                // ContentArea.Content = _settingsView;  // Phase 4
+                _settingsView ??= new SettingsView(_dataService);
+                _settingsView.Refresh();
+                ContentArea.Content = _settingsView;
                 _currentPage = "Settings";
                 ClearFooter();
                 UpdateFooter();
