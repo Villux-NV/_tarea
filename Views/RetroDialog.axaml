@@ -1,0 +1,74 @@
+<Window x:Class="Tarea.Views.RetroDialog"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowDecorations="None"
+        CanResize="False"
+        SizeToContent="WidthAndHeight"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent">
+
+    <Border Background="{DynamicResource BlackBrush}"
+            BorderBrush="{DynamicResource RoseBrush}"
+            BorderThickness="1"
+            Padding="24,20"
+            MinWidth="340"
+            MaxWidth="480">
+        <StackPanel>
+            <TextBlock x:Name="TitleText"
+                       FontSize="14"
+                       Foreground="{DynamicResource RoseBrush}"
+                       Margin="0,0,0,12" />
+
+            <TextBlock x:Name="MessageText"
+                       FontSize="12"
+                       Foreground="{DynamicResource MutedBrush}"
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,20" />
+
+            <DockPanel>
+                <Button x:Name="BtnCancel"
+                        Content="[ cancel ]"
+                        DockPanel.Dock="Right"
+                        Click="Cancel_Click"
+                        Cursor="Hand"
+                        IsVisible="False"
+                        Margin="8,0,0,0"
+                        Foreground="{DynamicResource MutedBrush}">
+                    <Button.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Padding" Value="8,4" />
+                        </Style>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#18FFE4E6" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+                <Button x:Name="BtnOk"
+                        Content="[ ok ]"
+                        DockPanel.Dock="Right"
+                        Click="Ok_Click"
+                        Cursor="Hand"
+                        HorizontalAlignment="Right"
+                        Foreground="{DynamicResource RoseBrush}">
+                    <Button.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Padding" Value="8,4" />
+                        </Style>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#18FFE4E6" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+
+                <TextBlock />
+            </DockPanel>
+        </StackPanel>
+    </Border>
+</Window>

@@ -41,6 +41,17 @@
 		<Style Selector="TextBox:focus">
 			<Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}" />
 		</Style>
+		<Style Selector="TextBox.compact /template/ Border#PART_BorderElement">
+			<Setter Property="MinHeight" Value="0" />
+			<Setter Property="Padding" Value="2,1" />
+		</Style>
+		<Style Selector="TextBox.compact /template/ TextPresenter">
+			<Setter Property="Margin" Value="0" />
+		</Style>
+		<Style Selector="TextBox.compact">
+			<Setter Property="MinHeight" Value="0" />
+			<Setter Property="Padding" Value="2,1" />
+		</Style>
 		<!-- Kill the Fluent focus adorner ring -->
 		<Style Selector="TextBox:focus-visible">
 			<Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}" />
@@ -120,7 +131,20 @@
 			<Setter Property="Background" Value="Transparent" />
 			<Setter Property="Foreground" Value="{DynamicResource BlueBrush}" />
 		</Style>
-
+		
+		<!-- ── Footer Opacity ───────────────── -->
+		<Style Selector="TextBlock.credit">
+			<Setter Property="Opacity" Value="0" />
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.3" />
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="Border.credit-wrap:pointerover TextBlock.credit">
+			<Setter Property="Opacity" Value="0.6" />
+		</Style>
+		
 		<!-- ── Color Swatch Button ──────────────────────── -->
 		<Style Selector="Button.swatch">
 			<Setter Property="Width" Value="28" />

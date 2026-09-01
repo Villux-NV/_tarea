@@ -12,6 +12,7 @@ public partial class CardNoteViewModel : ObservableObject
     private readonly DataService _dataService;
     private readonly string _cardId;
     private readonly Action _refreshParent;
+    private bool _isDropIndicatorAbove;
 
     public string Id => _note.Id;
     public int Order => _note.Order;
@@ -34,6 +35,12 @@ public partial class CardNoteViewModel : ObservableObject
 
     public string NoteForegroundKey => IsCrossedOut ? "MutedBrush" : "RoseBrush";
     public bool ShowStrikethrough => IsCrossedOut;
+
+    public bool IsDropIndicatorAbove
+    {
+        get => _isDropIndicatorAbove;
+        set => SetProperty(ref _isDropIndicatorAbove, value);
+    }
 
     public CardNoteViewModel(CardNote note, DataService dataService, string cardId, Action refreshParent)
     {

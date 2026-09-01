@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tarea.Models;
@@ -47,7 +48,7 @@ public partial class RoomViewModel : ObservableObject
 
     public string ProgressSummary => $"{DoneCardCount} done · {WipCardCount} wip · {TodoCardCount} todo";
 
-    public Func<string, bool>? ConfirmAction { get; set; }
+    public Func<string, Task<bool>>? ConfirmAction { get; set; }
 
     public RoomViewModel(DataService dataService)
     {

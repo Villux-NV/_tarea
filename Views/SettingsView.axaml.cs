@@ -611,6 +611,10 @@ public partial class SettingsView : UserControl
             await using var stream = await file.OpenWriteAsync();
             await using var writer = new StreamWriter(stream);
             await writer.WriteAsync(markdown);
+
+            var window = this.FindAncestorOfType<Window>();
+            if (window != null)
+                await RetroDialog.Alert(window, "export complete", $"Saved to {file.Name}");
         }
     }
 

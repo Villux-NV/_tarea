@@ -2,6 +2,7 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:conv="clr-namespace:Tarea.Converters"
+			 xmlns:helpers="clr-namespace:Tarea.Helpers"
              xmlns:vm="clr-namespace:Tarea.ViewModels"
              x:DataType="vm:CasaViewModel"
              Background="{DynamicResource BlackBrush}">
@@ -21,7 +22,7 @@
                           Margin="24,16">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel HorizontalAlignment="Left" />
+						<helpers:AnimatedWrapPanel HorizontalAlignment="Left" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -157,15 +158,31 @@
                                             <Border Tag="QuickAddArea"
                                                     DockPanel.Dock="Left"
                                                     IsVisible="{Binding IsQuickAdding}">
-                                                <TextBox x:Name="QuickAddInput"
+												<TextBox x:Name="QuickAddInput"
                                                          Text="{Binding QuickAddTitle}"
                                                          FontSize="11"
                                                          BorderThickness="0,0,0,1"
                                                          BorderBrush="{DynamicResource RoseBrush}"
-                                                         Padding="2,2"
+                                                         Padding="2,0"
                                                          Width="140"
+                                                         Height="20"
+                                                         MinHeight="0"
+                                                         VerticalContentAlignment="Center"
                                                          KeyDown="QuickAddInput_KeyDown"
-                                                         AttachedToVisualTree="InputField_AttachedToVisualTree" />
+                                                         AttachedToVisualTree="InputField_AttachedToVisualTree">
+													<TextBox.Styles>
+														<Style Selector="TextBox /template/ Border#PART_BorderElement">
+															<Setter Property="MinHeight" Value="0" />
+															<Setter Property="Padding" Value="2,0" />
+														</Style>
+														<Style Selector="TextBox /template/ TextPresenter">
+															<Setter Property="Margin" Value="0" />
+														</Style>
+														<Style Selector="TextBox /template/ DataValidationErrors">
+															<Setter Property="MinHeight" Value="0" />
+														</Style>
+													</TextBox.Styles>
+												</TextBox>
                                             </Border>
 
                                             <TextBlock />
@@ -187,21 +204,48 @@
 
                                     <Grid RowDefinitions="Auto,*,Auto">
 
-                                        <!-- Header -->
-                                        <DockPanel Grid.Row="0" Margin="4,4,4,8">
-                                            <Border ClipToBounds="True"
+										<!-- Header with edit button -->
+										<DockPanel Grid.Row="0" Margin="4,4,4,8">
+											<Button DockPanel.Dock="Right"
+                                                    Click="EditRoomTitle_Click"
+                                                    Cursor="Hand"
+                                                    IsVisible="{Binding !IsEditingTitle}"
+                                                    Margin="4,0,0,0">
+												<Button.Template>
+													<ControlTemplate>
+														<Border Background="Transparent" Padding="2,0">
+															<TextBlock Text="✎"
+                                                                       FontSize="12"
+                                                                       Foreground="{DynamicResource MutedBrush}" />
+														</Border>
+													</ControlTemplate>
+												</Button.Template>
+											</Button>
+
+											<Border ClipToBounds="True"
+                                                    IsVisible="{Binding !IsEditingTitle}"
                                                     PointerEntered="CardTitle_PointerEntered"
                                                     PointerExited="CardTitle_PointerExited">
-                                                <TextBlock Text="{Binding Title}"
+												<TextBlock Text="{Binding Title}"
                                                            FontSize="15"
                                                            Foreground="{DynamicResource MutedBrush}"
                                                            TextTrimming="CharacterEllipsis">
-                                                    <TextBlock.RenderTransform>
-                                                        <TranslateTransform X="0" />
-                                                    </TextBlock.RenderTransform>
-                                                </TextBlock>
-                                            </Border>
-                                        </DockPanel>
+													<TextBlock.RenderTransform>
+														<TranslateTransform X="0" />
+													</TextBlock.RenderTransform>
+												</TextBlock>
+											</Border>
+
+											<TextBox Text="{Binding EditTitleText}"
+                                                     FontSize="15"
+                                                     BorderThickness="0,0,0,1"
+                                                     BorderBrush="{DynamicResource RoseBrush}"
+                                                     Padding="0,1"
+                                                     MinHeight="0"
+                                                     IsVisible="{Binding IsEditingTitle}"
+                                                     KeyDown="RoomTitleEdit_KeyDown"
+                                                     AttachedToVisualTree="InputField_AttachedToVisualTree" />
+										</DockPanel>
 
                                         <!-- Details: description + summary -->
                                         <Border Grid.Row="1"
@@ -291,24 +335,58 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- ── Add Room Bar ─────────────────────────────── -->
-        <Border Grid.Row="1"
+		<!-- ── Add Room Bar ─────────────────────────────── -->
+		<Border Grid.Row="1"
                 BorderBrush="{DynamicResource RoseBrush}"
                 BorderThickness="0,1,0,0"
-                Padding="16,8">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBox x:Name="TxtAddRoom"
-                         Text="{Binding NewRoomTitle}"
-                         Width="200"
-                         FontSize="13"
-                         VerticalContentAlignment="Center"
-                         KeyDown="AddRoom_KeyDown" />
+                Padding="16,4"
+                Height="42">
+			<Grid>
+				<!-- Toggle button -->
+				<Button x:Name="BtnToggleAddRoom"
+                        Click="ToggleAddRoom_Click"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Cursor="Hand"
+                        IsVisible="True">
+					<Button.Template>
+						<ControlTemplate>
+							<Border Background="Transparent" Padding="16,2">
+								<TextBlock Text="+ add room"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource MutedBrush}"
+                                           HorizontalAlignment="Center" />
+							</Border>
+						</ControlTemplate>
+					</Button.Template>
+				</Button>
 
-                <Button Content="+ add room"
-                        Classes="primary"
-                        Command="{Binding AddRoomCommand}"
-                        Margin="8,0,0,0" />
-            </StackPanel>
-        </Border>
+				<!-- Input area -->
+				<StackPanel x:Name="AddRoomPanel"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsVisible="False">
+					<Border BorderBrush="{DynamicResource RoseBrush}"
+                            BorderThickness="2"
+                            Padding="0">
+						<TextBox x:Name="TxtAddRoom"
+                                 Text="{Binding NewRoomTitle}"
+                                 Width="200"
+                                 BorderThickness="0"
+                                 FontSize="13"
+                                 Padding="6,2"
+                                 MinHeight="0"
+                                 VerticalContentAlignment="Center"
+                                 KeyDown="AddRoom_KeyDown" />
+					</Border>
+
+					<Button Content="+ add"
+                            Classes="primary"
+                            Command="{Binding AddRoomCommand}"
+                            Margin="8,0,0,0" />
+				</StackPanel>
+			</Grid>
+		</Border>
     </Grid>
 </UserControl>

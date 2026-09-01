@@ -1,11 +1,12 @@
-using System;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
+using System;
+using System.Linq;
 using Tarea.Converters;
 using Tarea.Models;
 using Tarea.Services;
@@ -57,23 +58,16 @@ public partial class MainWindow : Window
 
         UrgencyToBrushConverter.Settings = _dataService.Settings;
 
+        _casaView = new CasaView(_dataService);
         _casaVm = new CasaViewModel(_dataService);
-        _casaVm.ConfirmAction = msg =>
-        {
-            // Simple sync confirm — RetroDialog will come later
-            // For now, always confirm
-            return true;
-        };
-
         _roomVm = new RoomViewModel(_dataService);
         _shortcutService = new KeyboardShortcutService(_dataService);
 
-        _casaView = new CasaView(_dataService);
-        _casaVm.ConfirmAction = msg => true;
+        _casaVm.ConfirmAction = msg => RetroDialog.Confirm(this, "confirm", msg);
         _casaVm.NavigateToRoom += OnNavigateToRoom;
 
         _roomView = new RoomView(_dataService);
-        _roomVm.ConfirmAction = msg => true;
+        _roomVm.ConfirmAction = msg => RetroDialog.Confirm(this, "confirm", msg);
         _roomVm.AnimateHideCard = card => _roomView.PulseAndHideCard(card);
 
         KeyDown += MainWindow_KeyDown;
@@ -392,6 +386,24 @@ public partial class MainWindow : Window
             return;
         }
 
+        // --- Arrow keys: scroll the current view ---
+        if (e.Key is Key.Up or Key.Down)
+        {
+            var scrollViewer = FindActiveScrollViewer();
+            if (scrollViewer != null)
+            {
+                double scrollAmount = 80;
+                var newOffset = e.Key == Key.Up
+                    ? scrollViewer.Offset.Y - scrollAmount
+                    : scrollViewer.Offset.Y + scrollAmount;
+
+                newOffset = Math.Max(0, Math.Min(newOffset, scrollViewer.Extent.Height - scrollViewer.Viewport.Height));
+                scrollViewer.Offset = new Vector(scrollViewer.Offset.X, newOffset);
+            }
+            e.Handled = true;
+            return;
+        }
+
         // --- Settings ---
         if (e.Key == _shortcutService.GetKey(settings.ShortcutSettings))
         {
@@ -402,6 +414,21 @@ public partial class MainWindow : Window
             }
             e.Handled = true;
             return;
+        }
+    }
+
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+
+        if (e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.XButton1Pressed)
+        {
+            if (_currentPage == "Settings")
+                NavigateTo(_previousPage);
+            else if (_currentPage == "Room")
+                NavigateTo("Casa");
+
+            e.Handled = true;
         }
     }
 
@@ -466,10 +493,6 @@ public partial class MainWindow : Window
         VignetteOverlay.IsVisible = master && s.AnimVignette;
     }
 
-    /// <summary>
-    /// Simple opacity animation using DispatcherTimer (works cross-platform).
-    /// Replaces WPF's BeginAnimation(OpacityProperty, ...).
-    /// </summary>
     private void AnimateOpacity(Control target, double from, double to, int durationMs, Action? onComplete = null)
     {
         target.Opacity = from;
@@ -531,5 +554,50 @@ public partial class MainWindow : Window
         }
 
         _dataService.Save();
+    }
+
+    private void ResizeGrip_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is not Border border || border.Tag is not string edge)
+            return;
+
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        var windowEdge = edge switch
+        {
+            "Top" => WindowEdge.North,
+            "Bottom" => WindowEdge.South,
+            "Left" => WindowEdge.West,
+            "Right" => WindowEdge.East,
+            "TopLeft" => WindowEdge.NorthWest,
+            "TopRight" => WindowEdge.NorthEast,
+            "BottomLeft" => WindowEdge.SouthWest,
+            "BottomRight" => WindowEdge.SouthEast,
+            _ => WindowEdge.South
+        };
+
+        BeginResizeDrag(windowEdge, e);
+    }
+
+
+    // ── Helpers ──────────────────────────────────────
+    private ScrollViewer? FindActiveScrollViewer()
+    {
+        var content = ContentArea.Content as Control;
+        if (content == null) return null;
+
+        return FindFirstScrollViewer(content);
+    }
+
+    private ScrollViewer? FindFirstScrollViewer(Visual parent)
+    {
+        foreach (var child in parent.GetVisualChildren())
+        {
+            if (child is ScrollViewer sv) return sv;
+            var result = FindFirstScrollViewer(child);
+            if (result != null) return result;
+        }
+        return null;
     }
 }

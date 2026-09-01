@@ -34,6 +34,8 @@ public partial class RoomView : UserControl
         _dataService = dataService;
         InitializeComponent();
 
+        KeyDown += RoomView_KeyDown;
+
         // Tunneling handler for click-outside-to-deselect
         AddHandler(PointerPressedEvent, RoomGrid_PointerPressed,
             Avalonia.Interactivity.RoutingStrategies.Tunnel);
@@ -259,6 +261,9 @@ public partial class RoomView : UserControl
     // ── Notes: select, edit, long-press crossout ────────
     private void Note_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
         if (sender is not Control el || el.DataContext is not CardNoteViewModel noteVm)
             return;
 
@@ -376,47 +381,69 @@ public partial class RoomView : UserControl
         if (sender is Control c && c.DataContext is CardViewModel cardVm)
         {
             cardVm.ShowAddNoteCommand.Execute(null);
+
+            // Walk up to find the card root, then search down for the note add textbox
+            var current = c as Visual;
+            Visual? cardRoot = null;
+            while (current != null)
+            {
+                if (current is Border b && (b.Tag as string) == "CardRoot")
+                { cardRoot = current; break; }
+                current = current.GetVisualParent();
+            }
+
+            if (cardRoot != null)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    var tb = FindNoteAddTextBox(cardRoot);
+                    tb?.Focus();
+                }, DispatcherPriority.Loaded);
+            }
         }
     }
 
+    private TextBox? FindNoteAddTextBox(Visual parent)
+    {
+        foreach (var child in parent.GetVisualChildren())
+        {
+            if (child is Border b && (b.Tag as string) == "NoteAddArea")
+            {
+                var tb = ViewHelpers.FindVisualChild<TextBox>(b);
+                if (tb != null) return tb;
+            }
+
+            var result = FindNoteAddTextBox(child);
+            if (result != null) return result;
+        }
+        return null;
+    }
+
+
     // ── Note Drag-Drop ──────────────────────────────────
+    private void ClearAllDropIndicators()
+    {
+        if (DataContext is not RoomViewModel roomVm) return;
+        foreach (var card in roomVm.Cards)
+        {
+            card.IsDropIndicatorAtEnd = false;
+            foreach (var note in card.Notes)
+                note.IsDropIndicatorAbove = false;
+        }
+    }
+
     private void OnNoteDragOver(object? sender, DragEventArgs e)
     {
         var text = e.DataTransfer.TryGetText();
-        // Only handle note drags — don't interfere with card drags
-        if (text != null && text.StartsWith("TareaNote:"))
-        {
-            e.DragEffects = DragDropEffects.Move;
-            e.Handled = true;
-        }
-    }
-
-    private void OnNoteDrop(object? sender, DragEventArgs e)
-    {
-        var text = e.DataTransfer.TryGetText();
-        // Only handle note drags — let card drops pass through to DragDropHelper
         if (text == null || !text.StartsWith("TareaNote:"))
             return;
 
-        var payload = text.Substring("TareaNote:".Length);
+        e.DragEffects = DragDropEffects.Move;
+        e.Handled = true;
 
-        var parts = payload.Split('|');
-        if (parts.Length != 2)
-            return;
-
-        var draggedNoteId = parts[0];
-        var draggedFromCardId = parts[1];
-
-        if (DataContext is not RoomViewModel roomVm)
-            return;
-
-        var sourceCard = roomVm.Cards.FirstOrDefault(c => c.Id == draggedFromCardId);
-        var draggedNote = sourceCard?.Notes.FirstOrDefault(n => n.Id == draggedNoteId);
-        if (sourceCard == null || draggedNote == null)
-            return;
+        ClearAllDropIndicators();
 
         var source = e.Source as Visual;
-
         CardNoteViewModel? targetNote = null;
         CardViewModel? targetCard = null;
 
@@ -425,12 +452,93 @@ public partial class RoomView : UserControl
         {
             if (current is Control c)
             {
-                if (targetNote == null && c.DataContext is CardNoteViewModel noteVm && c.Tag is string t && t == "NoteRow")
+                if (targetNote == null && c.DataContext is CardNoteViewModel noteVm
+                    && c is Border b && (b.Tag as string) == "NoteRow")
+                {
                     targetNote = noteVm;
-                if (targetCard == null && c.DataContext is CardViewModel cardVm)
-                    targetCard = cardVm;
+
+                    // Determine if pointer is in the top or bottom half of the note row
+                    var pos = e.GetPosition(b);
+                    bool inTopHalf = pos.Y < b.Bounds.Height / 2;
+
+                    if (inTopHalf)
+                    {
+                        noteVm.IsDropIndicatorAbove = true;
+                    }
+                    else
+                    {
+                        // "Below this note" = "above the next note", or "at end"
+                        var cardVm = FindCardViewModelFromVisual(current);
+                        if (cardVm != null)
+                        {
+                            int idx = -1;
+                            for (int i = 0; i < cardVm.Notes.Count; i++)
+                            {
+                                if (cardVm.Notes[i].Id == noteVm.Id) { idx = i; break; }
+                            }
+                            if (idx >= 0 && idx < cardVm.Notes.Count - 1)
+                                cardVm.Notes[idx + 1].IsDropIndicatorAbove = true;
+                            else
+                                cardVm.IsDropIndicatorAtEnd = true;
+                        }
+                    }
+                }
+                if (targetCard == null && c.DataContext is CardViewModel cvm)
+                    targetCard = cvm;
             }
-            if (targetCard != null) break;
+            if (targetCard != null && targetNote != null) break;
+            current = current.GetVisualParent();
+        }
+
+        // If we're over the card's note zone but not on a specific note → show at end
+        if (targetNote == null && targetCard != null)
+        {
+            targetCard.IsDropIndicatorAtEnd = true;
+        }
+    }
+
+    private void OnNoteDrop(object? sender, DragEventArgs e)
+    {
+        ClearAllDropIndicators();
+
+        var text = e.DataTransfer.TryGetText();
+        if (text == null || !text.StartsWith("TareaNote:"))
+            return;
+
+        var payload = text.Substring("TareaNote:".Length);
+        var parts = payload.Split('|');
+        if (parts.Length != 2) return;
+
+        var draggedNoteId = parts[0];
+        var draggedFromCardId = parts[1];
+
+        if (DataContext is not RoomViewModel roomVm) return;
+
+        var sourceCard = roomVm.Cards.FirstOrDefault(c => c.Id == draggedFromCardId);
+        var draggedNote = sourceCard?.Notes.FirstOrDefault(n => n.Id == draggedNoteId);
+        if (sourceCard == null || draggedNote == null) return;
+
+        var source = e.Source as Visual;
+        CardNoteViewModel? targetNote = null;
+        CardViewModel? targetCard = null;
+        bool inTopHalf = true;
+
+        var current = source;
+        while (current != null)
+        {
+            if (current is Control c)
+            {
+                if (targetNote == null && c.DataContext is CardNoteViewModel noteVm
+                    && c is Border b && (b.Tag as string) == "NoteRow")
+                {
+                    targetNote = noteVm;
+                    var pos = e.GetPosition(b);
+                    inTopHalf = pos.Y < b.Bounds.Height / 2;
+                }
+                if (targetCard == null && c.DataContext is CardViewModel cvm)
+                    targetCard = cvm;
+            }
+            if (targetCard != null && targetNote != null) break;
             current = current.GetVisualParent();
         }
 
@@ -439,6 +547,7 @@ public partial class RoomView : UserControl
 
         if (draggedFromCardId == targetCard.Id)
         {
+            // Same card reorder
             if (targetNote != null)
             {
                 int fromIndex = -1, toIndex = -1;
@@ -448,11 +557,18 @@ public partial class RoomView : UserControl
                     if (targetCard.Notes[i].Id == targetNote.Id) toIndex = i;
                 }
                 if (fromIndex >= 0 && toIndex >= 0)
+                {
+                    // Adjust for bottom-half drops: insert after the target
+                    if (!inTopHalf && toIndex < targetCard.Notes.Count - 1)
+                        toIndex = fromIndex < toIndex ? toIndex : toIndex + 1;
                     targetCard.ReorderNote(fromIndex, toIndex);
+                }
             }
+            // If no target note, dropping in empty space does nothing for same-card
         }
         else
         {
+            // Cross-card move
             if (targetNote != null)
             {
                 int toIndex = 0;
@@ -460,6 +576,7 @@ public partial class RoomView : UserControl
                 {
                     if (targetCard.Notes[i].Id == targetNote.Id) { toIndex = i; break; }
                 }
+                if (!inTopHalf) toIndex++;
                 targetCard.AcceptNoteFromOutside(draggedNote, toIndex);
             }
             else
@@ -470,6 +587,7 @@ public partial class RoomView : UserControl
 
         e.Handled = true;
     }
+
 
     // ── Note Editing ─────────────────────────────────────
     private void NoteEdit_KeyDown(object? sender, KeyEventArgs e)
@@ -486,6 +604,31 @@ public partial class RoomView : UserControl
         else if (e.Key == Key.Escape) { cardVm.CancelAddNoteCommand.Execute(null); e.Handled = true; }
     }
 
+    private void EditTitle_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (sender is Control c && c.DataContext is CardViewModel cardVm)
+        {
+            cardVm.StartTitleEdit();
+        }
+    }
+
+    private void BackTitleEdit_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (sender is not Control c || c.DataContext is not CardViewModel cardVm)
+            return;
+
+        if (e.Key == Key.Enter)
+        {
+            cardVm.CommitTitleEditCommand.Execute(null);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape)
+        {
+            cardVm.CancelTitleEditCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
 
     // ── Add Card ─────────────────────────────────────────
     private void AddCard_KeyDown(object? sender, KeyEventArgs e)
@@ -493,6 +636,17 @@ public partial class RoomView : UserControl
         if (e.Key == Key.Enter && DataContext is RoomViewModel vm)
         {
             vm.AddCardCommand.Execute(null);
+            // Keep panel open for rapid entry
+            Dispatcher.UIThread.Post(() =>
+            {
+                TxtAddCard.Focus();
+            }, DispatcherPriority.Loaded);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape)
+        {
+            AddCardPanel.IsVisible = false;
+            BtnToggleAddCard.IsVisible = true;
             e.Handled = true;
         }
     }
@@ -515,15 +669,48 @@ public partial class RoomView : UserControl
     // ── Click-outside-to-deselect ────────────────────────
     private void RoomGrid_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        var source = e.Source as Visual;
-
-        if (ViewHelpers.IsInsideTaggedArea(source, "NoteRow", "NoteAddArea", "NoteDropZone"))
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
 
-        if (DataContext is RoomViewModel roomVm)
+        if (DataContext is RoomViewModel vm)
         {
-            roomVm.DeselectAllNotes();
-            roomVm.CancelAllNoteAdding();
+            var source = e.Source as Control;
+
+            // Walk up to check what we're clicking inside
+            bool insideNoteRow = false;
+            CardViewModel? clickedCard = null;
+
+            var current = source;
+            while (current != null)
+            {
+                if (current is Border b)
+                {
+                    var tag = b.Tag as string;
+                    if (tag == "NoteRow") insideNoteRow = true;
+                    if (tag == "NoteAddArea" && current.DataContext is CardViewModel addCard
+                        && addCard.IsAddingNote)
+                        return; // Inside the active add area — don't close it
+                }
+                if (current.DataContext is CardViewModel cvm && clickedCard == null)
+                    clickedCard = cvm;
+                current = current.Parent as Control;
+            }
+
+            if (!insideNoteRow)
+            {
+                vm.DeselectAllNotes();
+                vm.CancelAllNoteAdding();
+            }
+        }
+    }
+
+    private void RoomView_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && DataContext is RoomViewModel vm)
+        {
+            vm.DeselectAllNotes();
+            vm.CancelAllNoteAdding();
+            e.Handled = true;
         }
     }
 
@@ -808,7 +995,40 @@ public partial class RoomView : UserControl
 
     public void StartQuickAdd()
     {
-        TxtAddCard.Focus();
-        TxtAddCard.SelectAll();
+        AddCardPanel.IsVisible = true;
+        BtnToggleAddCard.IsVisible = false;
+        Dispatcher.UIThread.Post(() =>
+        {
+            TxtAddCard.Focus();
+            TxtAddCard.SelectAll();
+        }, DispatcherPriority.Loaded);
+    }
+
+    private void ToggleAddCard_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var showing = !AddCardPanel.IsVisible;
+        AddCardPanel.IsVisible = showing;
+        BtnToggleAddCard.IsVisible = !showing;
+
+        if (showing)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                TxtAddCard.Focus();
+                TxtAddCard.SelectAll();
+            }, DispatcherPriority.Loaded);
+        }
+    }
+
+    private CardViewModel? FindCardViewModelFromVisual(Visual? element)
+    {
+        var current = element;
+        while (current != null)
+        {
+            if (current is Control c && c.DataContext is CardViewModel cvm)
+                return cvm;
+            current = current.GetVisualParent();
+        }
+        return null;
     }
 }

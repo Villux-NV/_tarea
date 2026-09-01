@@ -1,12 +1,12 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Tarea.Views.MainWindow"
-        Title="Tarea"
+        Title=" "
+		Icon="/Assets/icon-512.png"
         Height="700" Width="1100"
         MinHeight="500" MinWidth="600"
-        WindowDecorations="None"
-        Background="Transparent"
-        ExtendClientAreaToDecorationsHint="True">
+        WindowDecorations="BorderOnly"
+        Background="Transparent">
 
 	<!-- Outer border = the window edge -->
 	<Border BorderBrush="{DynamicResource RoseBrush}"
@@ -24,7 +24,7 @@
                     PointerPressed="TitleBar_PointerPressed">
 				<DockPanel>
 					<!-- Window title (left) -->
-					<TextBlock Text="tarea"
+					<TextBlock Text=""
                                FontSize="11"
                                Foreground="{DynamicResource MutedBrush}"
                                VerticalAlignment="Center"
@@ -110,11 +110,15 @@
                     BorderThickness="0,1,0,0"
                     Padding="16,6">
 				<DockPanel>
-					<TextBlock DockPanel.Dock="Left"
-                               Foreground="{DynamicResource MutedBrush}"
-                               FontSize="12"
-                               VerticalAlignment="Center"
-                               Text="made by _nickyv" />
+					<Border DockPanel.Dock="Left"
+							Background="Transparent"
+							Classes="credit-wrap">
+						<TextBlock Foreground="{DynamicResource MutedBrush}"
+								   FontSize="12"
+								   VerticalAlignment="Center"
+								   Text="made by _nickyv"
+								   Classes="credit" />
+					</Border>
 
 					<StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Right"
@@ -193,6 +197,53 @@
 						<GradientStop Color="#90000000" Offset="1.0" />
 					</RadialGradientBrush>
 				</Border.Background>
+			</Border>
+
+			<!-- ── Resize Grips ──────────────────────────── -->
+			<Border Grid.Row="0" Grid.RowSpan="4" ZIndex="300"
+                    IsHitTestVisible="False">
+				<Panel>
+					<Border Width="6" Height="6"
+                            HorizontalAlignment="Left" VerticalAlignment="Top"
+                            Cursor="TopLeftCorner" Background="Transparent"
+                            IsHitTestVisible="True"
+                            Tag="TopLeft" PointerPressed="ResizeGrip_PointerPressed" />
+					<Border Width="6" Height="6"
+                            HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Cursor="TopRightCorner" Background="Transparent"
+                            IsHitTestVisible="True"
+                            Tag="TopRight" PointerPressed="ResizeGrip_PointerPressed" />
+					<Border Width="6" Height="6"
+                            HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                            Cursor="BottomLeftCorner" Background="Transparent"
+                            IsHitTestVisible="True"
+                            Tag="BottomLeft" PointerPressed="ResizeGrip_PointerPressed" />
+					<Border Width="6" Height="6"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                            Cursor="BottomRightCorner" Background="Transparent"
+                            IsHitTestVisible="True"
+                            Tag="BottomRight" PointerPressed="ResizeGrip_PointerPressed" />
+					<Border Height="6"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                            Margin="6,0" Cursor="SizeNorthSouth" Background="Transparent"
+                            IsHitTestVisible="True"
+                            Tag="Top" PointerPressed="ResizeGrip_PointerPressed" />
+					<Border Height="6"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
+                            Margin="6,0" Cursor="SizeNorthSouth" Background="Transparent"
+                            IsHitTestVisible="True"
+                            Tag="Bottom" PointerPressed="ResizeGrip_PointerPressed" />
+					<Border Width="6"
+                            HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                            Margin="0,6" Cursor="SizeWestEast" Background="Transparent"
+                            IsHitTestVisible="True"
+                            Tag="Left" PointerPressed="ResizeGrip_PointerPressed" />
+					<Border Width="6"
+                            HorizontalAlignment="Right" VerticalAlignment="Stretch"
+                            Margin="0,6" Cursor="SizeWestEast" Background="Transparent"
+                            IsHitTestVisible="True"
+                            Tag="Right" PointerPressed="ResizeGrip_PointerPressed" />
+				</Panel>
 			</Border>
 		</Grid>
 	</Border>
