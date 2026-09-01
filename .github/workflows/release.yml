@@ -1,0 +1,69 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            artifact: tarea-win-x64
+          - os: macos-latest
+            rid: osx-x64
+            artifact: tarea-osx-x64
+          - os: macos-latest
+            rid: osx-arm64
+            artifact: tarea-osx-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: publish
+        run: dotnet publish -c Release -r ${{ matrix.rid }} -o publish
+
+      - name: zip (windows)
+        if: matrix.os == 'windows-latest'
+        run: Compress-Archive -Path publish/* -DestinationPath ${{ matrix.artifact }}.zip
+
+      - name: zip (macos)
+        if: matrix.os == 'macos-latest'
+        run: |
+          chmod +x publish/Tarea
+          cd publish && zip -r ../${{ matrix.artifact }}.zip . && cd ..
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: create release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: artifacts/*.zip
