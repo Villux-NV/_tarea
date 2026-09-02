@@ -23,6 +23,8 @@ download the latest release for your platform:
 - **windows** — `tarea-win-x64.zip`
 - **macos (intel)** — `tarea-osx-x64.zip`
 - **macos (apple silicon)** — `tarea-osx-arm64.zip`
+> **macos note:** the app is not code-signed. on first launch, macos will block it.  
+> open terminal and run `xattr -cr /path/to/Tarea` then launch again.
 
 unzip and run. no installer needed. data is stored in your local app data folder.
 
