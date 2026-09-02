@@ -31,9 +31,9 @@ each card has its own note list. notes are more than plain text — they support
 
 ## status cycling + auto-hide
 
-click a card's status badge to cycle through **todo → wip → done**. when a card hits done, it can automatically hide with a green pulse animation — the completed card collapses to a small `[x]` icon in the status bar. click the icon to bring it back.
+click a card's status badge to cycle through **todo → wip → done**. when a card hits done, it can automatically hide — the completed card collapses to a small `[x]` icon in the status bar. click the icon to bring it back.
 
-the hide delay, pulse animation, and auto-hide behavior are all configurable in settings.
+the hide delay and auto-hide behavior are all configurable in settings.
 
 <!-- clip: click status badge a few times to cycle through, show card pulse-hide on done, click [x] to restore -->
 
@@ -51,27 +51,13 @@ cards have a four-level urgency system: **none, low, medium, high**. higher urge
 
 ---
 
-## ratio bar
-
-the status bar at the bottom of each room includes an ascii progress bar that shows the proportion of todo, wip, and done cards at a glance.
-
-```
-[────────────│──────────│──────────────────────────]
-```
-
-<!-- clip: short clip of the ratio bar updating as you cycle a card's status -->
-
-![ratio bar](screenshots/ratio-bar.gif)
-
----
-
 ## themes
 
 three built-in presets plus a full custom palette editor.
 
-**rose** — the default. rose text on near-black, warm and readable.  
-**amber** — monochrome phosphor monitor. everything in amber and gold.  
-**integrale** — inspired by the lancia delta hf. cream, navy, and martini racing colors.
+**rose** — the default. rose text on near-black
+**amber** — monochrome phosphor monitor
+**integrale** — inspired by the lancia delta hf
 
 the custom editor exposes all eight palette keys with live preview. save and name as many custom themes as you want.
 
@@ -97,16 +83,6 @@ there's a master animations toggle to turn everything off at once.
 <!-- clip: toggle scanlines/vignette on and off, show boot sequence from cold start -->
 
 ![crt effects](screenshots/crt-effects.gif)
-
----
-
-## marquee scroll
-
-card and room titles that overflow their container scroll on hover — a back-and-forth marquee with eased timing. no tooltip needed, no truncation lost.
-
-<!-- clip: hover a long card title, show it scrolling -->
-
-![marquee](screenshots/marquee.gif)
 
 ---
 
