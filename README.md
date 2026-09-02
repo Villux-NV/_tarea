@@ -10,6 +10,12 @@ tasks live inside **cards**, cards live inside **rooms**. a room is a project, a
 
 ---
 
+## download
+
+[windows](https://github.com/Villux-NV/_tarea/releases/latest/download/tarea-win-x64.zip) · [macos intel](https://github.com/Villux-NV/_tarea/releases/latest/download/tarea-osx-x64.zip) · [macos apple silicon](https://github.com/Villux-NV/_tarea/releases/latest/download/tarea-osx-arm64.zip)
+
+---
+
 ## notes
 
 each card has its own note list. notes are more than plain text — they support selection, inline editing, and drag reordering.
