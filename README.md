@@ -16,6 +16,18 @@ tasks live inside **cards**, cards live inside **rooms**. a room is a project, a
 
 ---
 
+## install
+
+download the latest release for your platform:
+
+- **windows** — `tarea-win-x64.zip`
+- **macos (intel)** — `tarea-osx-x64.zip`
+- **macos (apple silicon)** — `tarea-osx-arm64.zip`
+
+unzip and run. no installer needed. data is stored in your local app data folder.
+
+---
+
 ## notes
 
 each card has its own note list. notes are more than plain text — they support selection, inline editing, and drag reordering.
@@ -122,18 +134,6 @@ export all rooms and cards to a structured markdown file. statuses map to checkb
 ## settings
 
 card dimensions, font size, status labels, due date warning threshold, delete confirmations, and completion behavior are all configurable. everything persists to a local json file.
-
----
-
-## install
-
-download the latest release for your platform:
-
-- **windows** — `tarea-win-x64.zip`
-- **macos (intel)** — `tarea-osx-x64.zip`
-- **macos (apple silicon)** — `tarea-osx-arm64.zip`
-
-unzip and run. no installer needed. data is stored in your local app data folder.
 
 ---
 
