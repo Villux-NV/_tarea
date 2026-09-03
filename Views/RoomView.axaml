@@ -23,7 +23,8 @@
                           Margin="24,16">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-						<helpers:AnimatedWrapPanel HorizontalAlignment="Left" />
+						<helpers:AnimatedWrapPanel HorizontalAlignment="Left" 
+												   AnimationMilliseconds="380" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>

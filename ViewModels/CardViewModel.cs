@@ -114,7 +114,7 @@ namespace Tarea.ViewModels
             CardUrgency.Low => "LOW",
             CardUrgency.Medium => "MED",
             CardUrgency.High => "HIGH",
-            _ => ""
+            _ => "-----"
         };
 
         public string StatusLabel => _card.Status switch

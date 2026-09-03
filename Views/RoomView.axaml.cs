@@ -676,9 +676,8 @@ public partial class RoomView : UserControl
         {
             var source = e.Source as Control;
 
-            // Walk up to check what we're clicking inside
             bool insideNoteRow = false;
-            CardViewModel? clickedCard = null;
+            bool insideNoteAddArea = false;
 
             var current = source;
             while (current != null)
@@ -689,18 +688,18 @@ public partial class RoomView : UserControl
                     if (tag == "NoteRow") insideNoteRow = true;
                     if (tag == "NoteAddArea" && current.DataContext is CardViewModel addCard
                         && addCard.IsAddingNote)
-                        return; // Inside the active add area — don't close it
+                        insideNoteAddArea = true;
                 }
-                if (current.DataContext is CardViewModel cvm && clickedCard == null)
-                    clickedCard = cvm;
                 current = current.Parent as Control;
             }
 
-            if (!insideNoteRow)
-            {
-                vm.DeselectAllNotes();
+            // Always cancel note-adding unless clicking inside the active add area
+            if (!insideNoteAddArea)
                 vm.CancelAllNoteAdding();
-            }
+
+            // Only deselect notes if clicking outside note rows
+            if (!insideNoteRow)
+                vm.DeselectAllNotes();
         }
     }
 
