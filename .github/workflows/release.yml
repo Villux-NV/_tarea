@@ -42,7 +42,42 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           chmod +x publish/Tarea
-          cd publish && zip -r ../${{ matrix.artifact }}.zip . && cd ..
+
+          # Create .app bundle
+          mkdir -p Tarea.app/Contents/MacOS
+          mkdir -p Tarea.app/Contents/Resources
+          cp publish/* Tarea.app/Contents/MacOS/ 2>/dev/null || true
+          cp -R publish/* Tarea.app/Contents/MacOS/ 2>/dev/null || true
+
+          cat > Tarea.app/Contents/Info.plist << 'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleExecutable</key>
+              <string>Tarea</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.nickyv.tarea</string>
+              <key>CFBundleName</key>
+              <string>tarea</string>
+              <key>CFBundleVersion</key>
+              <string>1.0.0</string>
+              <key>CFBundleShortVersionString</key>
+              <string>1.0.0</string>
+              <key>CFBundlePackagetype</key>
+              <string>APPL</string>
+              <key>LSMinimumSystemVersion</key>
+              <string>10.15</string>
+              <key>CFBundleIconFile</key>
+              <string>icon</string>
+              <key>NSHighResolutionCapable</key>
+              <true/>
+          </dict>
+          </plist>
+          PLIST
+
+          chmod +x Tarea.app/Contents/MacOS/Tarea
+          zip -r ${{ matrix.artifact }}.zip Tarea.app
 
       - name: upload artifact
         uses: actions/upload-artifact@v4
