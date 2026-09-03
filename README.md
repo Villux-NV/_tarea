@@ -6,8 +6,6 @@ a retro terminal task manager built with rooms and cards.
 
 tarea is a desktop kanban app with a crt aesthetic — monospace type, scanline overlays, typewriter effects, and a boot sequence. it runs on windows and macos.
 
-tasks live inside **cards**, cards live inside **rooms**. a room is a project, a card is a task, and each card holds notes, a status, urgency, and a due date.
-
 ---
 
 ## download
@@ -30,9 +28,35 @@ unzip and run. no installer needed. data is stored in your local app data folder
 
 ---
 
-## notes
+## rooms and cards
 
-each card has its own note list. notes are more than plain text — they support selection, inline editing, and drag reordering.
+tasks live inside **cards**, cards live inside **rooms**. a room is a project, a card is a task. the home view shows all your rooms — click into one to see its cards.
+
+<!-- clip: click into a room from casa, show cards inside -->
+
+![rooms and cards](screenshots/rooms-and-cards.gif)
+
+### status cycling + auto-hide
+
+click a card's status badge to cycle through **todo → wip → done**. when a card hits done, it can automatically hide — the completed card collapses to a small `[x]` icon in the status bar. click the icon to bring it back.
+
+the hide delay and auto-hide behavior are configurable in settings.
+
+<!-- clip: click status badge a few times to cycle through, show card pulse-hide on done, click [x] to restore -->
+
+![status cycling](screenshots/status-cycling.gif)
+
+### urgency tinting
+
+cards have a four-level urgency system: **none, low, medium, high**. higher urgency adds a subtle background tint to the card face, making urgent tasks visible at a glance without breaking the aesthetic.
+
+<!-- clip: cycle through urgency levels on a card, show the background tint changing -->
+
+![urgency](screenshots/urgency.gif)
+
+### notes
+
+each card has its own note list. notes support selection, inline editing, and drag reordering.
 
 **long-press** a note to cross it out without deleting it.  
 **drag** notes between cards to reorganize across tasks.
@@ -43,34 +67,14 @@ each card has its own note list. notes are more than plain text — they support
 
 ---
 
-## status cycling + auto-hide
+## settings
 
-click a card's status badge to cycle through **todo → wip → done**. when a card hits done, it can automatically hide — the completed card collapses to a small `[x]` icon in the status bar. click the icon to bring it back.
-
-the hide delay and auto-hide behavior are all configurable in settings.
-
-<!-- clip: click status badge a few times to cycle through, show card pulse-hide on done, click [x] to restore -->
-
-![status cycling](screenshots/status-cycling.gif)
-
----
-
-## urgency tinting
-
-cards have a four-level urgency system: **none, low, medium, high**. higher urgency adds a subtle background tint to the card face, making urgent tasks visible at a glance without breaking the aesthetic.
-
-<!-- clip: cycle through urgency levels on a card, show the background tint changing -->
-
-![urgency](screenshots/urgency.gif)
-
----
-
-## themes
+### themes
 
 three built-in presets plus a full custom palette editor.
 
-**rose** — the default. rose text on near-black
-**amber** — monochrome phosphor monitor
+**rose** — the default. rose text on near-black  
+**amber** — monochrome phosphor monitor  
 **integrale** — inspired by the lancia delta hf
 
 the custom editor exposes all eight palette keys with live preview. save and name as many custom themes as you want.
@@ -79,9 +83,7 @@ the custom editor exposes all eight palette keys with live preview. save and nam
 
 ![themes](screenshots/themes.gif)
 
----
-
-## crt effects
+### crt effects
 
 the retro layer is built from individual effects, each with its own toggle:
 
@@ -98,9 +100,7 @@ there's a master animations toggle to turn everything off at once.
 
 ![crt effects](screenshots/crt-effects.gif)
 
----
-
-## keyboard shortcuts
+### keyboard shortcuts
 
 all shortcuts are rebindable in settings:
 
@@ -133,12 +133,6 @@ export all rooms and cards to a structured markdown file. statuses map to checkb
 
 ---
 
-## settings
-
-card dimensions, font size, status labels, due date warning threshold, delete confirmations, and completion behavior are all configurable. everything persists to a local json file.
-
----
-
 ## build from source
 
 ```
@@ -155,4 +149,3 @@ requires [.net 8 sdk](https://dotnet.microsoft.com/download/dotnet/8.0).
 ## stack
 
 c# / .net 8 / avalonia ui / communitytoolkit.mvvm
-
