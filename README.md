@@ -145,4 +145,3 @@ requires [.net 8 sdk](https://dotnet.microsoft.com/download/dotnet/8.0).
 
 c# / .net 8 / avalonia ui / communitytoolkit.mvvm
 
-[tarea](https://github.com/Villux-NV/_tarea)

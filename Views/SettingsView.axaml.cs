@@ -668,6 +668,20 @@ public partial class SettingsView : UserControl
         SavedThemesList.ItemsSource = null;
         SavedThemesList.ItemsSource = items;
     }
+
+    private void OpenReleasesPage_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var url = "https://github.com/Villux-NV/_tarea/releases/latest";
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
+        catch { }
+    }
 }
 
 public class CustomColorItem
