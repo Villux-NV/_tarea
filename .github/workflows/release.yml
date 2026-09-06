@@ -36,12 +36,15 @@ jobs:
 
       - name: zip (windows)
         if: matrix.os == 'windows-latest'
-        run: Compress-Archive -Path publish/* -DestinationPath ${{ matrix.artifact }}.zip
+        run: |
+          Remove-Item publish/*.pdb -Force
+          Compress-Archive -Path publish/* -DestinationPath ${{ matrix.artifact }}.zip
 
       - name: zip (macos)
         if: matrix.os == 'macos-latest'
         run: |
           chmod +x publish/Tarea
+          rm -f publish/*.pdb
 
           # Create .app bundle
           mkdir -p Tarea.app/Contents/MacOS
