@@ -360,6 +360,28 @@ namespace Tarea.Views
             {
                 room.StartEditDescription();
                 e.Handled = true;
+
+                var current = el as Visual;
+                Visual? cardRoot = null;
+                while (current != null)
+                {
+                    if (current is Border b && (b.Tag as string) == "CardRoot")
+                    { cardRoot = current; break; }
+                    current = current.GetVisualParent();
+                }
+
+                if (cardRoot != null)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        var tb = FindDescriptionTextBox(cardRoot);
+                        if (tb != null)
+                        {
+                            tb.Focus();
+                            tb.SelectAll();
+                        }
+                    }, DispatcherPriority.Loaded);
+                }
             }
         }
 
@@ -380,6 +402,20 @@ namespace Tarea.Views
             }
         }
 
+        private TextBox? FindDescriptionTextBox(Visual parent)
+        {
+            foreach (var child in parent.GetVisualChildren())
+            {
+                if (child is Border b && (b.Tag as string) == "DescriptionArea" && b.IsVisible)
+                {
+                    var tb = ViewHelpers.FindVisualChild<TextBox>(b);
+                    if (tb != null) return tb;
+                }
+                var result = FindDescriptionTextBox(child);
+                if (result != null) return result;
+            }
+            return null;
+        }
 
         // ── Add Room ──────────────────────────────────────────
         private void AddRoom_KeyDown(object? sender, KeyEventArgs e)

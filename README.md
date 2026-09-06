@@ -2,7 +2,7 @@
 
 a retro terminal task manager built with rooms and cards.
 
-![tarea screenshot](screenshots/hero.png)
+![tarea screenshot](Assets/Screenshots/tarea-main.png)
 
 tarea is a desktop kanban app with a crt aesthetic — monospace type, scanline overlays, typewriter effects, and a boot sequence. it runs on windows and macos.
 
@@ -34,7 +34,9 @@ tasks live inside **cards**, cards live inside **rooms**. a room is a project, a
 
 <!-- clip: click into a room from casa, show cards inside -->
 
-![rooms and cards](screenshots/rooms-and-cards.gif)
+![rooms and cards](Assets/Screenshots/tarea-clickintocard.gif)
+
+![rooms and cards](Assets/Screenshots/tarea-cardnotedrag.gif)
 
 ### status cycling + auto-hide
 
@@ -44,7 +46,7 @@ the hide delay and auto-hide behavior are configurable in settings.
 
 <!-- clip: click status badge a few times to cycle through, show card pulse-hide on done, click [x] to restore -->
 
-![status cycling](screenshots/status-cycling.gif)
+![status cycling](Assets/Screenshots/tarea-cardhide.gif)
 
 ### urgency tinting
 
@@ -52,7 +54,7 @@ cards have a four-level urgency system: **none, low, medium, high**. higher urge
 
 <!-- clip: cycle through urgency levels on a card, show the background tint changing -->
 
-![urgency](screenshots/urgency.gif)
+![urgency](Assets/Screenshots/tarea-duedateurgency.gif)
 
 ### notes
 
@@ -63,7 +65,7 @@ each card has its own note list. notes support selection, inline editing, and dr
 
 <!-- clip: long-press a note to cross out, then drag a note from one card to another -->
 
-![notes demo](screenshots/notes.gif)
+![notes demo](Assets/Screenshots/tarea-crossoutnote.gif)
 
 ---
 
@@ -81,7 +83,7 @@ the custom editor exposes all eight palette keys with live preview. save and nam
 
 <!-- clip: switch between rose, amber, integrale in settings, then tweak a custom color -->
 
-![themes](screenshots/themes.gif)
+![themes](Assets/Screenshots/tarea-settingstheme.gif)
 
 ### crt effects
 
@@ -96,10 +98,6 @@ the retro layer is built from individual effects, each with its own toggle:
 
 there's a master animations toggle to turn everything off at once.
 
-<!-- clip: toggle scanlines/vignette on and off, show boot sequence from cold start -->
-
-![crt effects](screenshots/crt-effects.gif)
-
 ### keyboard shortcuts
 
 all shortcuts are rebindable in settings:
@@ -111,9 +109,6 @@ all shortcuts are rebindable in settings:
 | `esc` | go back |
 | `/` | search |
 
-<!-- clip: press N to open quick add, type a title, press enter -->
-
-![shortcuts](screenshots/shortcuts.gif)
 
 ---
 
@@ -136,7 +131,7 @@ export all rooms and cards to a structured markdown file. statuses map to checkb
 ## build from source
 
 ```
-git clone https://github.com/Villux-NV/tarea
+git clone https://github.com/Villux-NV/_tarea
 cd tarea
 dotnet build
 dotnet run
@@ -149,3 +144,5 @@ requires [.net 8 sdk](https://dotnet.microsoft.com/download/dotnet/8.0).
 ## stack
 
 c# / .net 8 / avalonia ui / communitytoolkit.mvvm
+
+[tarea](https://github.com/Villux-NV/_tarea)
