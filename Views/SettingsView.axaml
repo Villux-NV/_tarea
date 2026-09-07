@@ -800,7 +800,7 @@
 				<Run Text="tarea — retro take on a modern solution" />
 			</TextBlock>
 			<TextBlock Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,4,0,0">
-				<Run Text="v1.0.5 — .net 8 / avalonia" />
+				<Run Text="v1.0.0 — .net 8 / avalonia" />
 			</TextBlock>
 			<Button Classes="ghost"
                     Content="check for updates"
